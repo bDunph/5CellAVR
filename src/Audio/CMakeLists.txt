@@ -1,0 +1,6 @@
+add_library(Audio STATIC CsoundSession.cpp CsoundSession.hpp)
+if(APPLE)
+	target_include_directories(Audio PUBLIC ./ /Library/Frameworks/CsoundLib64.framework/Headers)
+elseif(WIN32)
+	target_include_directories(Audio PUBLIC ./ "${PROJECT_SOURCE_DIR}/../include/csound")
+endif()

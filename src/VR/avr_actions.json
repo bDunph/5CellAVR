@@ -1,0 +1,69 @@
+{
+      "default_bindings": [
+         {
+            "controller_type" : "vive_controller",
+            "binding_url" : "hellovr_bindings_vive_controller.json"
+         }
+      ], 
+  "actions": [
+    {
+      "name": "/actions/avr/in/RotateStructure",
+      "requirement": "suggested",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/avr/in/HideThisController",
+      "requirement": "optional",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/avr/in/triggerhaptic",
+      "requirement": "optional",
+      "type": "vector1"
+    },
+    {
+      "name": "/actions/avr/in/AnalogInput",
+      "requirement": "optional",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/avr/in/Hand_Right",
+      "requirement": "suggested",
+      "type": "pose"
+    },
+    {
+      "name": "/actions/avr/in/Hand_Left",
+      "requirement": "suggested",
+      "type": "pose"
+    },
+    {
+      "name": "/actions/avr/out/haptic_left",
+      "requirement": "suggested",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/avr/out/haptic_right",
+      "requirement": "suggested",
+      "type": "vibration"
+    }
+  ],
+  "action_sets": [
+	  {
+		  "name": "/actions/avr",
+		  "usage": "leftright"
+	  }
+  ],
+    "localization" : [
+        {
+            "language_tag": "en_US",
+            "/actions/avr/in/RotateStructure" : "Rotate Structure",
+            "/actions/avr/in/HideThisController" : "Hide this Controller",
+            "/actions/avr/in/triggerhaptic" : "Trigger Haptic Pulse",
+            "/actions/avr/in/AnalogInput" : "Analog Input",
+            "/actions/avr/in/Hand_Right" : "Right Hand Pose",
+            "/actions/avr/in/Hand_Left" : "Left Hand Pose",
+            "/actions/avr/out/haptic_left" : "Left Haptic Feedback",
+            "/actions/avr/out/haptic_right" : "Right Haptic Feedback"
+        }
+    ]
+}
