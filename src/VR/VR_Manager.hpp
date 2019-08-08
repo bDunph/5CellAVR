@@ -14,9 +14,13 @@
 #ifdef __APPLE__ 
 #include <GL/glew.h>
 #include "GLFW/glfw3.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #elif _WIN32 
 #include "GL/glew.h"
 #include "glfw3.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #endif
 
 class VR_Manager {
@@ -30,24 +34,24 @@ public:
 	void ExitVR();
 	bool HandleInput();
 	void ProcessVREvent(const vr::VREvent_t &event);
-	Matrix4 ConvertSteamVRMatrixToMatrix4(const vr::HmdMatrix34_t &matPose);
+	glm::mat4 ConvertSteamVRMatrixToGlmMat4(const vr::HmdMatrix34_t &matPose);
 	CGLRenderModel* FindOrLoadRenderModel(const char* pchRenderModelName);
 
 	bool BSetupCameras();
 	void UpdateHMDMatrixPose();
-	Matrix4 GetHMDMatrixProjectionEye(vr::Hmd_Eye nEye);
-	Matrix4 GetHMDMatrixPoseEye(vr::Hmd_Eye nEye);
-	Matrix4 GetCurrentViewProjectionMatrix(vr::Hmd_Eye nEye);
-	Matrix4 GetCurrentViewEyeMatrix(vr::Hmd_Eye nEye);
-	Matrix4 GetCurrentViewMatrix(vr::Hmd_Eye nEye);
-	Matrix4 GetCurrentProjectionMatrix(vr::Hmd_Eye nEye);
-	Matrix4 GetCurrentEyeMatrix(vr::Hmd_Eye nEye);
+	glm::mat4 GetHMDMatrixProjectionEye(vr::Hmd_Eye nEye);
+	glm::mat4 GetHMDMatrixPoseEye(vr::Hmd_Eye nEye);
+	glm::mat4 GetCurrentViewProjectionMatrix(vr::Hmd_Eye nEye);
+	glm::mat4 GetCurrentViewEyeMatrix(vr::Hmd_Eye nEye);
+	glm::mat4 GetCurrentViewMatrix(vr::Hmd_Eye nEye);
+	glm::mat4 GetCurrentProjectionMatrix(vr::Hmd_Eye nEye);
+	glm::mat4 GetCurrentEyeMatrix(vr::Hmd_Eye nEye);
 
 	bool BGetRotate3DTrigger();
 	float GetNearClip();
 	float GetFarClip();
 
-	Vector4 GetFarPlaneDimensions(vr::Hmd_Eye nEye);
+	glm::vec4 GetFarPlaneDimensions(vr::Hmd_Eye nEye);
 
 	enum EHand
 	{
@@ -70,22 +74,22 @@ private:
 		vr::VRInputValueHandle_t m_source = vr::k_ulInvalidInputValueHandle;
 		vr::VRActionHandle_t m_actionPose = vr::k_ulInvalidActionHandle;
 		vr::VRActionHandle_t m_actionHaptic = vr::k_ulInvalidActionHandle;
-		Matrix4 m_rmat4Pose;
+		glm::mat4 m_rmat4Pose;
 		CGLRenderModel *m_pRenderModel = nullptr;
 		std::string m_sRenderModelName;
 		bool m_bShowController;
 	};
 	ControllerInfo_t m_rHand[2];
 
-	Vector2 m_vAnalogValue;
+	glm::vec2 m_vAnalogValue;
 
-	Matrix4 m_mat4eyePosLeft;
-	Matrix4 m_mat4eyePosRight;
+	glm::mat4 m_mat4eyePosLeft;
+	glm::mat4 m_mat4eyePosRight;
 
-	Matrix4 m_mat4ProjectionLeft;
-	Matrix4 m_mat4ProjectionRight;
+	glm::mat4 m_mat4ProjectionLeft;
+	glm::mat4 m_mat4ProjectionRight;
 
-	Matrix4 m_mat4HMDPose;
+	glm::mat4 m_mat4HMDPose;
 
 	std::vector<CGLRenderModel*> m_vecRenderModels;
 	
@@ -100,7 +104,7 @@ private:
 	vr::TrackedDevicePose_t m_rTrackedDevicePose[ vr::k_unMaxTrackedDeviceCount ];
 	int m_iValidPoseCount;
 	std::string m_strPoseClasses;                            // what classes we saw poses for this frame
-	Matrix4 m_rmat4DevicePose[vr::k_unMaxTrackedDeviceCount];
+	glm::mat4 m_rmat4DevicePose[vr::k_unMaxTrackedDeviceCount];
 	char m_rDevClassChar[vr::k_unMaxTrackedDeviceCount];   // for each device, a character representing its class
 	float m_fNearClip;
 	float m_fFarClip;

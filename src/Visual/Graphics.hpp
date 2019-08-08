@@ -13,9 +13,13 @@
 #ifdef __APPLE__ 
 #include <GL/glew.h>
 #include "GLFW/glfw3.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #elif _WIN32 
 #include "GL/glew.h"
 #include "glfw3.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #endif
 
 class Graphics{
@@ -41,7 +45,7 @@ public:
 
 private:
 
-	Vector4 m_vFarPlaneDimensions;
+	glm::vec4 m_vFarPlaneDimensions;
 
 	struct FramebufferDesc
 	{
@@ -67,10 +71,10 @@ private:
 	
 	struct VertexDataWindow
 	{
-		Vector2 position;
-		Vector2 texCoord;
+		glm::vec2 position;
+		glm::vec2 texCoord;
 
-		VertexDataWindow( const Vector2 & pos, const Vector2 tex ) :  position(pos), texCoord(tex) {	}
+		VertexDataWindow( const glm::vec2& pos, const glm::vec2 tex ) :  position(pos), texCoord(tex) {	}
 	};
 	
 	GLuint m_unCompanionWindowVAO;
@@ -83,7 +87,7 @@ private:
 	GLuint m_unControllerVAO;
 	GLuint m_glControllerVertBuffer;
 	//GLint m_nSceneMatrixLocation;
-	Matrix4 m_mat4HMDPose;
+	glm::mat4 m_mat4HMDPose;
 	GLuint m_unSceneVAO;
 	GLuint m_glSceneVBO;
 	GLuint m_gluiTetraVAO;
@@ -146,6 +150,5 @@ private:
 	GLuint fiveCellShaderProg;
 
 	FiveCell fiveCell;
-
 };
 #endif

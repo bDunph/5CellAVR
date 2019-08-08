@@ -191,7 +191,7 @@ bool VR_Manager::HandleInput()
 		}
 		else
 		{
-			m_rHand[eHand].m_rmat4Pose = ConvertSteamVRMatrixToMatrix4( poseData.pose.mDeviceToAbsoluteTracking );
+			m_rHand[eHand].m_rmat4Pose = ConvertSteamVRMatrixToGlmMat4( poseData.pose.mDeviceToAbsoluteTracking );
 
 			vr::InputOriginInfo_t originInfo;
 			if ( vr::VRInput()->GetOriginTrackedDeviceInfo( poseData.activeOrigin, &originInfo, sizeof( originInfo ) ) == vr::VRInputError_None 
@@ -215,7 +215,7 @@ bool VR_Manager::HandleInput()
 // the projection matrix each frame. These values are then used to update
 // the quad sent to the raymarching shader.
 // ----------------------------------------------------------------------------
-Vector4 VR_Manager::GetFarPlaneDimensions(vr::Hmd_Eye nEye){
+glm::vec4 VR_Manager::GetFarPlaneDimensions(vr::Hmd_Eye nEye){
 	
 	float* pfLeft = new float;
 	float* pfRight = new float;
@@ -234,7 +234,7 @@ Vector4 VR_Manager::GetFarPlaneDimensions(vr::Hmd_Eye nEye){
 	delete pfTop;
 	delete pfBottom;
 
-	Vector4 planeDimensions = Vector4(tanLeft, tanRight, tanTop, tanBottom);
+	glm::vec4 planeDimensions = glm::vec4(tanLeft, tanRight, tanTop, tanBottom);
 	return planeDimensions;
 }
 
@@ -261,9 +261,9 @@ void VR_Manager::ProcessVREvent(const vr::VREvent_t & event)
 //-----------------------------------------------------------------------------
 // Purpose: Converts a SteamVR matrix to our local matrix class
 //-----------------------------------------------------------------------------
-Matrix4 VR_Manager::ConvertSteamVRMatrixToMatrix4(const vr::HmdMatrix34_t &matPose)
+glm::mat4 VR_Manager::ConvertSteamVRMatrixToGlmMat4(const vr::HmdMatrix34_t &matPose)
 {
-	Matrix4 matrixObj(
+	glm::mat4 matrixObj(
 		matPose.m[0][0], matPose.m[1][0], matPose.m[2][0], 0.0,
 		matPose.m[0][1], matPose.m[1][1], matPose.m[2][1], 0.0,
 		matPose.m[0][2], matPose.m[1][2], matPose.m[2][2], 0.0,
@@ -364,7 +364,7 @@ void VR_Manager::UpdateHMDMatrixPose()
 		if (m_rTrackedDevicePose[nDevice].bPoseIsValid)
 		{
 			m_iValidPoseCount++;
-			m_rmat4DevicePose[nDevice] = ConvertSteamVRMatrixToMatrix4(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
+			m_rmat4DevicePose[nDevice] = ConvertSteamVRMatrixToGlmMat4(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
 			if (m_rDevClassChar[nDevice]==0)
 			{
 				switch (m_pHMD->GetTrackedDeviceClass(nDevice))
@@ -392,9 +392,9 @@ void VR_Manager::UpdateHMDMatrixPose()
 //  Gets a Current View Projection Matrix with respect to nEye,
 //  which may be an Eye_Left or an Eye_Right.
 //-----------------------------------------------------------------------------
-Matrix4 VR_Manager::GetCurrentViewProjectionMatrix(vr::Hmd_Eye nEye)
+glm::mat4 VR_Manager::GetCurrentViewProjectionMatrix(vr::Hmd_Eye nEye)
 {
-	Matrix4 matMVP;
+	glm::mat4 matMVP;
 	if(nEye == vr::Eye_Left)
 	{
 		matMVP = m_mat4ProjectionLeft * m_mat4eyePosLeft * m_mat4HMDPose;
@@ -410,9 +410,9 @@ Matrix4 VR_Manager::GetCurrentViewProjectionMatrix(vr::Hmd_Eye nEye)
 //-----------------------------------------------------------------------------
 // Gets the current ViewEye matrix.
 // ----------------------------------------------------------------------------
-Matrix4 VR_Manager::GetCurrentViewEyeMatrix(vr::Hmd_Eye nEye)
+glm::mat4 VR_Manager::GetCurrentViewEyeMatrix(vr::Hmd_Eye nEye)
 {
-	Matrix4 matVE;
+	glm::mat4 matVE;
 	if(nEye == vr::Eye_Left)
 	{
 		matVE = m_mat4eyePosLeft * m_mat4HMDPose;
@@ -428,18 +428,18 @@ Matrix4 VR_Manager::GetCurrentViewEyeMatrix(vr::Hmd_Eye nEye)
 //------------------------------------------------------------------------------
 // Gets current View Matrix.
 // -----------------------------------------------------------------------------
-Matrix4 VR_Manager::GetCurrentViewMatrix(vr::Hmd_Eye nEye)
+glm::mat4VR_Manager::GetCurrentViewMatrix(vr::Hmd_Eye nEye)
 {
-	Matrix4 matV = m_mat4HMDPose;
+	glm::mat4 matV = m_mat4HMDPose;
 	return matV;
 }
 
 //-----------------------------------------------------------------------------
 // Gets current Eye Matrix
 // ----------------------------------------------------------------------------
-Matrix4 VR_Manager::GetCurrentEyeMatrix(vr::Hmd_Eye nEye)
+glm::mat4 VR_Manager::GetCurrentEyeMatrix(vr::Hmd_Eye nEye)
 {
-	Matrix4 matE;
+	glm::mat4 matE;
 	if(nEye == vr::Eye_Left)
 	{
 		matE = m_mat4eyePosLeft;
@@ -455,9 +455,9 @@ Matrix4 VR_Manager::GetCurrentEyeMatrix(vr::Hmd_Eye nEye)
 //-----------------------------------------------------------------------------
 // Gets current Projection Matrix
 // ----------------------------------------------------------------------------
-Matrix4 VR_Manager::GetCurrentProjectionMatrix(vr::Hmd_Eye nEye)
+glm::mat4 VR_Manager::GetCurrentProjectionMatrix(vr::Hmd_Eye nEye)
 {
-	Matrix4 matP;
+	glm::mat4 matP;
 	if(nEye == vr::Eye_Left)
 	{
 		matP = m_mat4ProjectionLeft;
@@ -512,14 +512,14 @@ bool VR_Manager::BSetupCameras()
 //-----------------------------------------------------------------------------
 // Gets a Matrix Projection Eye with respect to nEye.
 //-----------------------------------------------------------------------------
-Matrix4 VR_Manager::GetHMDMatrixProjectionEye(vr::Hmd_Eye nEye)
+glm::mat4 VR_Manager::GetHMDMatrixProjectionEye(vr::Hmd_Eye nEye)
 {
 	if (!m_pHMD)
-		return Matrix4();
+		return glm::mat4(0.0);
 
 	vr::HmdMatrix44_t mat = m_pHMD->GetProjectionMatrix(nEye, m_fNearClip, m_fFarClip);
 
-	return Matrix4(
+	return glm::mat4(
 		mat.m[0][0], mat.m[1][0], mat.m[2][0], mat.m[3][0],
 		mat.m[0][1], mat.m[1][1], mat.m[2][1], mat.m[3][1], 
 		mat.m[0][2], mat.m[1][2], mat.m[2][2], mat.m[3][2], 
@@ -530,20 +530,20 @@ Matrix4 VR_Manager::GetHMDMatrixProjectionEye(vr::Hmd_Eye nEye)
 //-----------------------------------------------------------------------------
 // Gets an HMDMatrixPoseEye with respect to nEye.
 //-----------------------------------------------------------------------------
-Matrix4 VR_Manager::GetHMDMatrixPoseEye(vr::Hmd_Eye nEye)
+glm::mat4 VR_Manager::GetHMDMatrixPoseEye(vr::Hmd_Eye nEye)
 {
 	if ( !m_pHMD )
-		return Matrix4();
+		return glm::mat4(0.0);
 
 	vr::HmdMatrix34_t matEyeHead = m_pHMD->GetEyeToHeadTransform(nEye);
-	Matrix4 matrixObj(
+	glm::mat4 matrixObj = glm::mat4(
 		matEyeHead.m[0][0], matEyeHead.m[1][0], matEyeHead.m[2][0], 0.0, 
 		matEyeHead.m[0][1], matEyeHead.m[1][1], matEyeHead.m[2][1], 0.0,
 		matEyeHead.m[0][2], matEyeHead.m[1][2], matEyeHead.m[2][2], 0.0,
 		matEyeHead.m[0][3], matEyeHead.m[1][3], matEyeHead.m[2][3], 1.0f
 		);
 
-	return matrixObj.invert();
+	return glm::inverse(matrixObj);
 }
 
 bool VR_Manager::BGetRotate3DTrigger(){

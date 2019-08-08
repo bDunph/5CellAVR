@@ -10,8 +10,8 @@ class FiveCell {
 
 public:
 	bool setup();
-	void update();
-	void draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg);
+	void update(glm::mat4& projMat, glm::mat4& viewEyeMat);
+	void draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, glm::mat4& projMat, glm::mat4& viewEyeMat);
 	void exit();
 
 private:
@@ -21,6 +21,7 @@ private:
 	glm::vec3 cameraUp;
 	float deltaTime;
 	float lastFrame;
+	float currentFrame;
 	bool needDraw;
 	float radius;
 
@@ -35,8 +36,10 @@ private:
 	GLint ground_modelLoc;
 	GLint ground_lightPosLoc;
 	GLint ground_light2PosLoc;
+	GLint ground_cameraPosLoc;
 	
 	//fivecell 
+	glm::vec4 vertArray[5];
 	GLuint vao;
 	GLuint index;
 	GLuint lineIndex;
@@ -49,15 +52,20 @@ private:
 	GLint lightPosLoc;
 	GLint light2PosLoc;
 	GLint alphaLoc;	
+	GLint cameraPosLoc;
 
 	//matrices
 	glm::mat4 modelMatrix;
 	glm::mat4 scale5CellMatrix;
 	glm::mat4 fiveCellModelMatrix;
+	glm::mat4 groundModelMatrix;
 
 	//lights
 	glm::vec3 lightPos;
 	glm::vec3 light2Pos;
+
+	//SoundObjects
+	SoundObject soundObjects [5];
 	
 };
 #endif

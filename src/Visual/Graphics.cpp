@@ -418,10 +418,10 @@ bool Graphics::BSetupCompanionWindow(std::unique_ptr<VR_Manager>& vrm)
 	std::vector<VertexDataWindow> vVerts;
 
 	// left eye verts
-	vVerts.push_back( VertexDataWindow( Vector2(-1, -1), Vector2(0, 1)) );
-	vVerts.push_back( VertexDataWindow( Vector2(1, -1), Vector2(1, 1)) );
-	vVerts.push_back( VertexDataWindow( Vector2(-1, 1), Vector2(0, 0)) );
-	vVerts.push_back( VertexDataWindow( Vector2(1, 1), Vector2(1, 0)) );
+	vVerts.push_back( VertexDataWindow( glm::vec2(-1, -1), glm::vec2(0, 1)) );
+	vVerts.push_back( VertexDataWindow( glm::vec2(1, -1), glm::vec2(1, 1)) );
+	vVerts.push_back( VertexDataWindow( glm::vec2(-1, 1), glm::vec2(0, 0)) );
+	vVerts.push_back( VertexDataWindow( glm::vec2(1, 1), glm::vec2(1, 0)) );
 
 	// right eye verts
 	//vVerts.push_back( VertexDataWindow( Vector2(0, -1), Vector2(0, 1)) );
@@ -561,14 +561,14 @@ void Graphics::RenderControllerAxes(std::unique_ptr<VR_Manager>& vrm)
 		if ( !vrm->m_rHand[i].m_bShowController )
 			continue;
 
-		const Matrix4& mat = vrm->m_rHand[i].m_rmat4Pose;
+		const glm::mat4& mat = vrm->m_rHand[i].m_rmat4Pose;
 
-		Vector4 center = mat * Vector4( 0, 0, 0, 1 );
+		glm::vec4 center = mat * glm::vec4( 0, 0, 0, 1 );
 
 		for ( int i = 0; i < 3; ++i )
 		{
-			Vector3 color( 0, 0, 0 );
-			Vector4 point( 0, 0, 0, 1 );
+			glm::vec3 color( 0, 0, 0 );
+			glm::vec4 point( 0, 0, 0, 1 );
 			point[i] += 0.05f;  // offset in X, Y, Z
 			color[i] = 1.0;  // R, G, B
 			point = mat * point;
@@ -591,9 +591,9 @@ void Graphics::RenderControllerAxes(std::unique_ptr<VR_Manager>& vrm)
 			m_uiControllerVertCount += 2;
 		}
 
-		Vector4 start = mat * Vector4( 0, 0, -0.02f, 1 );
-		Vector4 end = mat * Vector4( 0, 0, -39.f, 1 );
-		Vector3 color( .92f, .92f, .71f );
+		glm::vec4 start = mat * glm::vec4( 0, 0, -0.02f, 1 );
+		glm::vec4 end = mat * glm::vec4( 0, 0, -39.f, 1 );
+		glm::vec3 color( .92f, .92f, .71f );
 
 		vertdataarray.push_back( start.x );vertdataarray.push_back( start.y );vertdataarray.push_back( start.z );
 		vertdataarray.push_back( color.x );vertdataarray.push_back( color.y );vertdataarray.push_back( color.z );
@@ -685,16 +685,19 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 
-	Matrix4 currentProjMatrix = vrm->GetCurrentProjectionMatrix(nEye);
-	Matrix4 currentViewMatrix = vrm->GetCurrentViewMatrix(nEye);
-	Matrix4 currentEyeMatrix = vrm->GetCurrentEyeMatrix(nEye);
-	Matrix4 viewEyeMatrix = currentEyeMatrix * currentViewMatrix;
-	Matrix4 viewEyeProjMatrix = currentProjMatrix * currentEyeMatrix * currentViewMatrix;
+	glm::mat4 currentProjMatrix = vrm->GetCurrentProjectionMatrix(nEye);
+	glm::mat4 currentViewMatrix = vrm->GetCurrentViewMatrix(nEye);
+	glm::mat4 currentEyeMatrix = vrm->GetCurrentEyeMatrix(nEye);
+	glm::mat4 viewEyeMatrix = currentEyeMatrix * currentViewMatrix;
+	glm::mat4 viewEyeProjMatrix = currentProjMatrix * currentEyeMatrix * currentViewMatrix;
 
 	//update variables for fiveCell
 	fiveCell.update(currentProjMatrix, viewEyeMatrix);
+
+	//draw fiveCell scene
+	fiveCell.draw(skyboxShaderProg, groundPlaneShaderProg, soundObjShaderProg, fiveCellShaderProg, currentProjMatrix, viewEyeMatrix);
 
 	bool bIsInputAvailable = vrm->m_pHMD->IsInputAvailable();
 
@@ -702,7 +705,7 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 	{
 		// draw the controller axis lines
 		glUseProgram(m_unControllerTransformProgramID);
-		glUniformMatrix4fv(m_nControllerMatrixLocation, 1, GL_FALSE, vrm->GetCurrentViewProjectionMatrix(nEye).get());
+		glUniformMatrix4fv(m_nControllerMatrixLocation, 1, GL_FALSE, &vrm->GetCurrentViewProjectionMatrix(nEye)[0][0]);
 		glBindVertexArray(m_unControllerVAO);
 		glDrawArrays(GL_LINES, 0, m_uiControllerVertCount);
 		glBindVertexArray(0);
@@ -717,9 +720,9 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 		if (!vrm->m_rHand[i].m_bShowController || !vrm->m_rHand[i].m_pRenderModel)
 			continue;
 
-		const Matrix4& matDeviceToTracking = vrm->m_rHand[i].m_rmat4Pose;
-		Matrix4 matMVP = vrm->GetCurrentViewProjectionMatrix(nEye) * matDeviceToTracking;
-		glUniformMatrix4fv(m_nRenderModelMatrixLocation, 1, GL_FALSE, matMVP.get());
+		const glm::mat4& matDeviceToTracking = vrm->m_rHand[i].m_rmat4Pose;
+		glm::mat4 matMVP = vrm->GetCurrentViewProjectionMatrix(nEye) * matDeviceToTracking;
+		glUniformMatrix4fv(m_nRenderModelMatrixLocation, 1, GL_FALSE, &matMVP[0][0]);
 
 		vrm->m_rHand[i].m_pRenderModel->Draw();
 	}

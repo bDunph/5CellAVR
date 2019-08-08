@@ -51,8 +51,8 @@ bool FiveCell::setup(){
 	}
 //************************************************************
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	//glEnable(GL_DEPTH_TEST);
+	//glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -67,9 +67,9 @@ bool FiveCell::setup(){
 	//projectionMatrix = glm::perspective(45.0f, (float)g_gl_width / (float)g_gl_height, 0.1f, 1000.0f);
 
 	// variables for view matrix
-	//cameraPos = glm::vec3(0.0f, 2.0f, 3.0f);
-	//cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	//cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
+	cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	//model matrix
 	modelMatrix = glm::mat4(1.0f);
@@ -93,8 +93,6 @@ bool FiveCell::setup(){
 //***************************************************************************************************
 // SoundObject 
 //**************************************************************************************************
-
-	SoundObject soundObjects [5];
 	for(int i = 0; i < _countof(soundObjects); i++){
 
 		if(!soundObjects[i].setup()){
@@ -147,11 +145,11 @@ bool FiveCell::setup(){
 	ground_lightPosLoc = glGetUniformLocation(groundPlaneShaderProg, "lightPos");
 	ground_light2PosLoc = glGetUniformLocation(groundPlaneShaderProg, "light2Pos");
 
-	//GLint ground_cameraPosLoc = glGetUniformLocation(groundPlaneShaderProg, "camPos");
+	ground_cameraPosLoc = glGetUniformLocation(groundPlaneShaderProg, "camPos");
 	
 	glBindVertexArray(0);
 
-	glm::mat4 groundModelMatrix = modelMatrix;
+	groundModelMatrix = modelMatrix;
 //***************************************************************************************************		
 		
 
@@ -216,7 +214,7 @@ bool FiveCell::setup(){
 	};
 
 	//array of verts
-	glm::vec4 vertArray [5] = {
+	vertArray = {
 		glm::vec4(vertices[0], vertices[1], vertices[2], vertices[3]),
 		glm::vec4(vertices[4], vertices[5], vertices[6], vertices[7]),
 		glm::vec4(vertices[8], vertices[9], vertices[10], vertices[11]),
@@ -371,7 +369,7 @@ bool FiveCell::setup(){
 	lightPosLoc = glGetUniformLocation(shader_program, "lightPos");
 	light2PosLoc = glGetUniformLocation(shader_program, "light2Pos");
 
-	//GLint cameraPosLoc = glGetUniformLocation(shader_program, "camPos");
+	cameraPosLoc = glGetUniformLocation(shader_program, "camPos");
 
 	alphaLoc = glGetUniformLocation(shader_program, "alpha");
 
@@ -392,19 +390,22 @@ bool FiveCell::setup(){
 	return true;
 }
 
-void FiveCell::update(){
+void FiveCell::update(glm::mat4& projMat, glm::mat4& viewEyeMat){
 
 //***********************************************************************************************************
 // Update Stuff Here
 //*********************************************************************************************************
-		float currentFrame = glfwGetTime();
+		currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		
 		//_update_fps_counter(window);
 		
-		glClearColor(0.87, 0.85, 0.75, 0.95);
+		//glClearColor(0.87, 0.85, 0.75, 0.95);
 		//wipe the drawing surface clear
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//update camera position
+		cameraPos = viewEyeMat * cameraPos;
 
 		//float rotVal = glm::radians(45.0f);
 		//rotation around W axis
@@ -435,7 +436,7 @@ void FiveCell::update(){
  	
 			projectedVerts[i] = glm::vec3(projectedPointX, projectedPointY, projectedPointZ);
 			
-			glm::vec4 pos = projectionMatrix * viewMatrix * fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0);
+			glm::vec4 pos = projMat * viewEyeMat * fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0);
 
 			//calculate azimuth and elevation values for hrtf
 		
@@ -473,14 +474,14 @@ void FiveCell::update(){
 		
 }
 
-void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg){
+void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, glm::mat4& projMat, glm::mat4& viewEyeMat){
 		
 //**********************************************************************************************************
 // Draw Stuff Here
 //*********************************************************************************************************
 
 		//draw skybox
-		skybox.draw(projectionMatrix, viewMatrix, skyboxProg);
+		skybox.draw(projMat, viewEyeMat, skyboxProg);
 		glDepthFunc(GL_LESS);
 		
 		//draw 4D polytope	
@@ -490,8 +491,8 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
 		//glUseProgram(fiveCellProg);
 
-		//glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, &projectionMatrix[0][0]);
-		//glUniformMatrix4fv(viewMatLoc, 1, GL_FALSE, &viewMatrix[0][0]);
+		//glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+		//glUniformMatrix4fv(viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
 		//glUniformMatrix4fv(fiveCellModelMatLoc, 1, GL_FALSE, &fiveCellModelMatrix[0][0]);
       		//glUniformMatrix4fv(rotationZWLoc, 1, GL_FALSE, &rotationZW[0][0]);
 		//glUniformMatrix4fv(rotationXWLoc, 1, GL_FALSE, &rotationXW[0][0]);
@@ -552,8 +553,8 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, groundIndexBuffer); 
 		glUseProgram(groundPlaneProg);
 
-		glUniformMatrix4fv(ground_projMatLoc, 1, GL_FALSE, &projectionMatrix[0][0]);
-		glUniformMatrix4fv(ground_viewMatLoc, 1, GL_FALSE, &viewMatrix[0][0]);
+		glUniformMatrix4fv(ground_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+		glUniformMatrix4fv(ground_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
 		glUniformMatrix4fv(ground_modelMatLoc, 1, GL_FALSE, &groundModelMatrix[0][0]);
 		glUniform3f(ground_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(ground_light2PosLoc, lightPos2.x, lightPos2.y, lightPos2.z);
@@ -565,7 +566,7 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 
 		//draw sound test objects
 		for(int i = 0; i < _countof(soundObjects); i++){
-			soundObjects[i].draw(projectionMatrix, viewMatrix, lightPos, lightPos2, cameraPos, soundObjProg);
+			soundObjects[i].draw(projMat, viewEyeMat, lightPos, light2Pos, cameraPos, soundObjProg);
 		}
 		//update other events like input handling
 		//glfwPollEvents();
