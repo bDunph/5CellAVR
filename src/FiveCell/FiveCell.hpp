@@ -1,22 +1,32 @@
 #ifndef FIVE_CELL_HPP
 #define FIVE_CELL_HPP
 
+#include "SoundObject.hpp"
+#include "CsoundSession.hpp"
+
+#ifdef __APPLE__ 
+#include <GL/glew.h>
+#include "GLFW/glfw3.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#elif _WIN32 
+#include "GL/glew.h"
+#include "glfw3.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#endif
 
 class FiveCell {
 
 public:
-	bool setup();
+	bool setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GLuint groundPlaneProg, GLuint fiveCellProg);
 	void update(glm::mat4& projMat, glm::mat4& viewEyeMat);
 	void draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, glm::mat4& projMat, glm::mat4& viewEyeMat);
 	void exit();
 
 private:
 
-	glm::vec3 cameraPos;
+	glm::vec4 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
 	float deltaTime;
@@ -33,7 +43,7 @@ private:
 
 	GLint ground_projMatLoc;
 	GLint ground_viewMatLoc;
-	GLint ground_modelLoc;
+	GLint ground_modelMatLoc;
 	GLint ground_lightPosLoc;
 	GLint ground_light2PosLoc;
 	GLint ground_cameraPosLoc;
@@ -66,6 +76,9 @@ private:
 
 	//SoundObjects
 	SoundObject soundObjects [5];
+
+	//Skybox
+	Skybox skybox;
 	
 };
 #endif

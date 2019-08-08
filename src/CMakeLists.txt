@@ -88,6 +88,7 @@ include_directories(
 		
 		"${PROJECT_BINARY_DIR}"
 		"${PROJECT_SOURCE_DIR}"
+		"${PROJECT_SOURCE_DIR}/FiveCell"
 		"${PROJECT_SOURCE_DIR}/Visual"
 		"${PROJECT_SOURCE_DIR}/VR"
 		"${PROJECT_SOURCE_DIR}/AvrApp"
@@ -100,6 +101,7 @@ include_directories(
 
 
 add_subdirectory(Visual)
+add_subdirectory(FiveCell)
 add_subdirectory(VR)
 add_subdirectory(AvrApp)
 add_subdirectory(ValveTools)
@@ -108,8 +110,8 @@ add_subdirectory(ValveTools)
 
 if(APPLE)
 	add_executable(avr main.cpp CsoundSession.cpp CsoundSession.hpp lodepng.cpp lodepng.h)
-	target_link_libraries(avr AvrApp VR ${OPENVR} ValveTools Visual ${GLEW_LIBRARIES} glfw ${OPENGL_gl_LIBRARY} ${CSOUND_API} ${CSOUND_PERF_THREAD})
+	target_link_libraries(avr AvrApp VR ${OPENVR} ValveTools Visual FiveCell ${GLEW_LIBRARIES} glfw ${OPENGL_gl_LIBRARY} ${CSOUND_API} ${CSOUND_PERF_THREAD})
 elseif(WIN32)
 	add_executable(avr main.cpp CsoundSession.cpp CsoundSession.hpp csPerfThread.cpp csPerfThread.hpp lodepng.cpp lodepng.h)
-	target_link_libraries(avr AvrApp VR OpenVR_target ValveTools Visual Glew_target ${GLFW_WIN} ${OPENGL_gl_LIBRARY} Csound_target Libsndfile_target)
+	target_link_libraries(avr AvrApp VR OpenVR_target ValveTools Visual FiveCell Glew_target ${GLFW_WIN} ${OPENGL_gl_LIBRARY} Csound_target Libsndfile_target)
 endif()

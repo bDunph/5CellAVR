@@ -1,6 +1,5 @@
-#include "CsoundSession.hpp"
+#include "FiveCell.hpp"
 #include "Skybox.hpp"
-#include "SoundObject.hpp"
 
 #include <string>
 #include <cstdio>
@@ -21,13 +20,13 @@
 #define _countof(x) (sizeof(x)/sizeof((x)[0]))
 #endif
 
-bool FiveCell::setup(){
+bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GLuint groundPlaneProg, GLuint fiveCellProg){
 
 //************************************************************
 //Csound performance thread
 //************************************************************
 	std::string csdName = "";
-	if(argc > 1) csdName = argv[1];
+	if(!csd.empty()) csdName = csd;
 	CsoundSession *session = new CsoundSession(csdName);
 	for(int i = 0; i < 5; i++){
 		std::string val1 = "azimuth" + std::to_string(i);
@@ -67,7 +66,7 @@ bool FiveCell::setup(){
 	//projectionMatrix = glm::perspective(45.0f, (float)g_gl_width / (float)g_gl_height, 0.1f, 1000.0f);
 
 	// variables for view matrix
-	cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
+	cameraPos = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -75,14 +74,13 @@ bool FiveCell::setup(){
 	modelMatrix = glm::mat4(1.0f);
 
 	lightPos = glm::vec3(-2.0f, -1.0f, -1.5f); 
-	lightPos2 = glm::vec3(1.0f, 40.0f, 1.5f);
+	light2Pos = glm::vec3(1.0f, 40.0f, 1.5f);
 //****************************************************************************************************
 
 //***************************************************************************************************
 // Skybox
 //**************************************************************************************************
 
-	Skybox skybox;
 	if(!skybox.setup()){
 		std::cout << "ERROR: Skybox init failed" << std::endl;
 		return false;
@@ -138,14 +136,14 @@ bool FiveCell::setup(){
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
 	//uniform setup
-	ground_projMatLoc = glGetUniformLocation(groundPlaneShaderProg, "projMat");
-	ground_viewMatLoc = glGetUniformLocation(groundPlaneShaderProg, "viewMat");
-	ground_modelMatLoc = glGetUniformLocation(groundPlaneShaderProg, "groundModelMat");
+	ground_projMatLoc = glGetUniformLocation(groundPlaneProg, "projMat");
+	ground_viewMatLoc = glGetUniformLocation(groundPlaneProg, "viewMat");
+	ground_modelMatLoc = glGetUniformLocation(groundPlaneProg, "groundModelMat");
 
-	ground_lightPosLoc = glGetUniformLocation(groundPlaneShaderProg, "lightPos");
-	ground_light2PosLoc = glGetUniformLocation(groundPlaneShaderProg, "light2Pos");
+	ground_lightPosLoc = glGetUniformLocation(groundPlaneProg, "lightPos");
+	ground_light2PosLoc = glGetUniformLocation(groundPlaneProg, "light2Pos");
 
-	ground_cameraPosLoc = glGetUniformLocation(groundPlaneShaderProg, "camPos");
+	ground_cameraPosLoc = glGetUniformLocation(groundPlaneProg, "camPos");
 	
 	glBindVertexArray(0);
 
@@ -214,7 +212,7 @@ bool FiveCell::setup(){
 	};
 
 	//array of verts
-	vertArray = {
+	glm::vec4 vertArray [5] = {
 		glm::vec4(vertices[0], vertices[1], vertices[2], vertices[3]),
 		glm::vec4(vertices[4], vertices[5], vertices[6], vertices[7]),
 		glm::vec4(vertices[8], vertices[9], vertices[10], vertices[11]),
@@ -360,18 +358,18 @@ bool FiveCell::setup(){
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	//uniforms for 4D shape
-	projMatLoc = glGetUniformLocation(shader_program, "projMat");
-	viewMatLoc = glGetUniformLocation(shader_program, "viewMat");
-	fiveCellModelMatLoc = glGetUniformLocation(shader_program, "fiveCellModelMat");
-	rotationZWLoc = glGetUniformLocation(shader_program, "rotZW");
-	rotationXWLoc = glGetUniformLocation(shader_program, "rotXW");
+	projMatLoc = glGetUniformLocation(fiveCellProg, "projMat");
+	viewMatLoc = glGetUniformLocation(fiveCellProg, "viewMat");
+	fiveCellModelMatLoc = glGetUniformLocation(fiveCellProg, "fiveCellModelMat");
+	rotationZWLoc = glGetUniformLocation(fiveCellProg, "rotZW");
+	rotationXWLoc = glGetUniformLocation(fiveCellProg, "rotXW");
 
-	lightPosLoc = glGetUniformLocation(shader_program, "lightPos");
-	light2PosLoc = glGetUniformLocation(shader_program, "light2Pos");
+	lightPosLoc = glGetUniformLocation(fiveCellProg, "lightPos");
+	light2PosLoc = glGetUniformLocation(fiveCellProg, "light2Pos");
 
-	cameraPosLoc = glGetUniformLocation(shader_program, "camPos");
+	cameraPosLoc = glGetUniformLocation(fiveCellProg, "camPos");
 
-	alphaLoc = glGetUniformLocation(shader_program, "alpha");
+	alphaLoc = glGetUniformLocation(fiveCellProg, "alpha");
 
 	glBindVertexArray(0);
 
@@ -440,7 +438,7 @@ void FiveCell::update(glm::mat4& projMat, glm::mat4& viewEyeMat){
 
 			//calculate azimuth and elevation values for hrtf
 		
-			glm::vec3 viewerPos = cameraPos * cameraFront;
+			glm::vec4 viewerPos = cameraPos * glm::vec4(cameraFront, 1.0f);
 			glm::vec3 soundPos = glm::vec3(pos); 
 	
 			//distance

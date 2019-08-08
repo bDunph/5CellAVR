@@ -130,12 +130,11 @@ bool Graphics::BInitGL(std::unique_ptr<VR_Manager>& vrm, bool fullscreen){
 	glDepthFunc(GL_LESS);//depth testing interprets a smaller value as 'closer'
 
 	// setup scene geometry
-	fiveCell.setup();	
 	skyboxShaderProg = BCreateSceneShaders("skybox");
 	soundObjShaderProg = BCreateSceneShaders("soundObj");
 	groundPlaneShaderProg = BCreateSceneShaders("groundPlane");
 	fiveCellShaderProg = BCreateSceneShaders("rasterPolychoron");
-
+	fiveCell.setup("mode5cell.csd", skyboxShaderProg, soundObjShaderProg, groundPlaneShaderProg, fiveCellShaderProg);	
 	return true;
 }
 
