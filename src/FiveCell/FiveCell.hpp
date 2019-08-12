@@ -21,13 +21,14 @@ class FiveCell {
 
 public:
 	bool setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GLuint groundPlaneProg, GLuint fiveCellProg);
-	void update(glm::mat4& projMat, glm::mat4& viewEyeMat);
+	void update(glm::mat4& projMat, glm::mat4& viewMat);
 	void draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, glm::mat4& projMat, glm::mat4& viewEyeMat);
 	void exit();
 
 private:
 
-	glm::vec4 cameraPos;
+	glm::vec3 cameraPos;
+	glm::vec3 camPosPerEye;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
 	float deltaTime;

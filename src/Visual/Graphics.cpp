@@ -695,7 +695,7 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 	glm::mat4 viewEyeProjMatrix = currentProjMatrix * currentEyeMatrix * currentViewMatrix;
 
 	//update variables for fiveCell
-	fiveCell.update(currentProjMatrix, viewEyeMatrix);
+	fiveCell.update(currentProjMatrix, currentViewMatrix);
 
 	//draw fiveCell scene
 	fiveCell.draw(skyboxShaderProg, groundPlaneShaderProg, soundObjShaderProg, fiveCellShaderProg, currentProjMatrix, viewEyeMatrix);

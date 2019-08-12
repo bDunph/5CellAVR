@@ -159,9 +159,9 @@ bool Skybox::setup(){
 	return true;
 }
 
-void Skybox::draw(glm::mat4 projMat, glm::mat4 viewMat, GLuint skyboxProg){
+void Skybox::draw(glm::mat4 projMat, glm::mat4 viewEyeMat, GLuint skyboxProg){
 
-	glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(viewMat));
+	glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(viewEyeMat));
 
 	glDepthFunc(GL_LEQUAL);
 	glDepthMask(GL_FALSE);
