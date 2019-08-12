@@ -1,5 +1,4 @@
 #include "FiveCell.hpp"
-#include "Skybox.hpp"
 
 #include <string>
 #include <cstdio>
@@ -27,7 +26,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 //************************************************************
 	std::string csdName = "";
 	if(!csd.empty()) csdName = csd;
-	CsoundSession *session = new CsoundSession(csdName);
+	session = new CsoundSession(csdName);
 	for(int i = 0; i < 5; i++){
 		std::string val1 = "azimuth" + std::to_string(i);
 		const char* azimuth = val1.c_str();	
@@ -545,27 +544,27 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 		//glBindVertexArray(0);
 
 		// draw ground plane second 
-		glDepthFunc(GL_LESS);
+		//glDepthFunc(GL_LESS);
 
-		glBindVertexArray(groundVAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, groundIndexBuffer); 
-		glUseProgram(groundPlaneProg);
+		//glBindVertexArray(groundVAO);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, groundIndexBuffer); 
+		//glUseProgram(groundPlaneProg);
 
-		glUniformMatrix4fv(ground_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
-		glUniformMatrix4fv(ground_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
-		glUniformMatrix4fv(ground_modelMatLoc, 1, GL_FALSE, &groundModelMatrix[0][0]);
-		glUniform3f(ground_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-		glUniform3f(ground_light2PosLoc, lightPos2.x, lightPos2.y, lightPos2.z);
-		glUniform3f(ground_cameraPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
+		//glUniformMatrix4fv(ground_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+		//glUniformMatrix4fv(ground_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
+		//glUniformMatrix4fv(ground_modelMatLoc, 1, GL_FALSE, &groundModelMatrix[0][0]);
+		//glUniform3f(ground_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+		//glUniform3f(ground_light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
+		//glUniform3f(ground_cameraPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
 
-		glDrawElements(GL_TRIANGLES, 6 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
+		//glDrawElements(GL_TRIANGLES, 6 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		//glBindVertexArray(0);
 
-		//draw sound test objects
-		for(int i = 0; i < _countof(soundObjects); i++){
-			soundObjects[i].draw(projMat, viewEyeMat, lightPos, light2Pos, cameraPos, soundObjProg);
-		}
+		////draw sound test objects
+		//for(int i = 0; i < _countof(soundObjects); i++){
+		//	soundObjects[i].draw(projMat, viewEyeMat, lightPos, light2Pos, cameraPos, soundObjProg);
+		//}
 		//update other events like input handling
 		//glfwPollEvents();
 
@@ -589,7 +588,7 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 
 void FiveCell::exit(){
 	//stop csound
-	session->stopPerformance();
+	session->StopPerformance();
 	//close GL context and any other GL resources
 	glfwTerminate();
 }

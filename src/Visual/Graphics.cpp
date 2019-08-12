@@ -9,7 +9,6 @@
 #include "ShaderManager.hpp"
 #include "Log.hpp"
 #include "SystemInfo.hpp"
-#include "FiveCell.hpp"
 
 #ifndef _countof
 #define _countof(x) (sizeof(x)/sizeof((x)[0]))
@@ -143,15 +142,17 @@ bool Graphics::BInitGL(std::unique_ptr<VR_Manager>& vrm, bool fullscreen){
 //----------------------------------------------------------------------------
 GLuint Graphics::BCreateSceneShaders(std::string shaderName){
 
-	std::string vertShaderName = shaderName.append(".vert");
-	std::string fragShaderName = shaderName.append(".frag");
+	std::string vertName = shaderName;
+	std::string fragName = shaderName;
+	std::string vertShaderName = vertName.append(".vert");
+	std::string fragShaderName = fragName.append(".frag");
 
 	//load shaders
-	char* vertShader;
+	const char* vertShader;
 	bool isVertLoaded = load_shader(vertShaderName.c_str(), vertShader);
 	if(!isVertLoaded) return NULL;
 	
-	char* fragShader;
+	const char* fragShader;
 	bool isFragLoaded = load_shader(fragShaderName.c_str(), fragShader);
 	if(!isFragLoaded) return NULL;
 	
@@ -639,7 +640,8 @@ void Graphics::RenderControllerAxes(std::unique_ptr<VR_Manager>& vrm)
 //-----------------------------------------------------------------------------
 void Graphics::RenderStereoTargets(std::unique_ptr<VR_Manager>& vrm)
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.87, 0.85, 0.75, 0.95);
+	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_MULTISAMPLE);
 
 	// Left Eye
@@ -763,7 +765,7 @@ void Graphics::RenderCompanionWindow()
 			glReadPixels(0, 0, m_nCompanionWindowWidth, m_nCompanionWindowHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 		}
 	
-		WriteToPNG(pixels);
+		//WriteToPNG(pixels);
 
 		free(pixels);
 		pixels = nullptr;
@@ -856,6 +858,8 @@ void Graphics::CleanUpGL(std::unique_ptr<VR_Manager>& vrm){
 		}
 
 		glfwTerminate();
+
+		fiveCell.exit();
 	}
 }
 

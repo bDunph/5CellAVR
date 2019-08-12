@@ -1,6 +1,7 @@
 #ifndef FIVE_CELL_HPP
 #define FIVE_CELL_HPP
 
+#include "Skybox.hpp"
 #include "SoundObject.hpp"
 #include "CsoundSession.hpp"
 
@@ -80,5 +81,7 @@ private:
 	//Skybox
 	Skybox skybox;
 	
+	//Csound
+	CsoundSession *session;
 };
 #endif

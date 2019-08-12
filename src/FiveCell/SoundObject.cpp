@@ -1,7 +1,12 @@
 #include "SoundObject.hpp"
 //#include "shader_manager.h"
 
-#include <GLFW/glfw3.h>
+#ifdef __APPLE__ 
+#include "GLFW/glfw3.h"
+#elif _WIN32 
+#include "glfw3.h"
+#endif
+
 #include <iostream>
 
 bool SoundObject::setup(){

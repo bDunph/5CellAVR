@@ -5,6 +5,7 @@
 #include <string>
 //#include <ctime>
 
+#include "FiveCell.hpp"
 #include "VR_Manager.hpp"
 #include "Matrices.h"
 #include "Vectors.h"
@@ -29,7 +30,7 @@ public:
 	Graphics(std::unique_ptr<ExecutionFlags>& flagPtr);
 	bool BInitGL(std::unique_ptr<VR_Manager>& vrm, bool fullscreen = false);
 	bool BCreateDefaultShaders();
-	bool BCreateSceneShaders(std::string shaderName);
+	GLuint BCreateSceneShaders(std::string shaderName);
 	GLuint CompileGLShader( const char *pchShaderName, const char *pchVertexShader, const char *pchFragmentShader );
 	bool BSetupStereoRenderTargets(std::unique_ptr<VR_Manager>& vrm);
 	void CleanUpGL(std::unique_ptr<VR_Manager>& vrm);

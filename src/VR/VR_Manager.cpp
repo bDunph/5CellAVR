@@ -384,7 +384,7 @@ void VR_Manager::UpdateHMDMatrixPose()
 	if (m_rTrackedDevicePose[vr::k_unTrackedDeviceIndex_Hmd].bPoseIsValid)
 	{
 		m_mat4HMDPose = m_rmat4DevicePose[vr::k_unTrackedDeviceIndex_Hmd];
-		m_mat4HMDPose.invert();
+		m_mat4HMDPose = glm::inverse(m_mat4HMDPose);
 	}
 }
 
@@ -428,7 +428,7 @@ glm::mat4 VR_Manager::GetCurrentViewEyeMatrix(vr::Hmd_Eye nEye)
 //------------------------------------------------------------------------------
 // Gets current View Matrix.
 // -----------------------------------------------------------------------------
-glm::mat4VR_Manager::GetCurrentViewMatrix(vr::Hmd_Eye nEye)
+glm::mat4 VR_Manager::GetCurrentViewMatrix(vr::Hmd_Eye nEye)
 {
 	glm::mat4 matV = m_mat4HMDPose;
 	return matV;
@@ -476,10 +476,10 @@ glm::mat4 VR_Manager::GetCurrentProjectionMatrix(vr::Hmd_Eye nEye)
 bool VR_Manager::BSetupCameras()
 {
 	//Arbitrary vector to test whether matrices returned below are identity
-	Vector4 testVec4 = Vector4(1.3f, 2.6f, 0.5f, 3.9f);
+	glm::vec4 testVec4 = glm::vec4(1.3f, 2.6f, 0.5f, 3.9f);
 
 	m_mat4ProjectionLeft = GetHMDMatrixProjectionEye(vr::Eye_Left);	
-	Vector4 testResult = m_mat4ProjectionLeft * testVec4;
+	glm::vec4 testResult = m_mat4ProjectionLeft * testVec4;
 	if(testResult == testVec4){
 		std::cout << "Error: Left eye projection matrix returned identity!" << std::endl;
 		return false;
