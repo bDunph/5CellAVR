@@ -165,11 +165,11 @@ void Skybox::draw(glm::mat4 projMat, glm::mat4 viewEyeMat, GLuint skyboxProg){
 
 	glDepthFunc(GL_LEQUAL);
 	glDepthMask(GL_FALSE);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndexBuffer); 
 	glUseProgram(skyboxProg);
 	glUniformMatrix4fv(skybox_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
 	glUniformMatrix4fv(skybox_viewMatLoc, 1, GL_FALSE, &viewNoTranslation[0][0]);
-	glBindVertexArray(skyboxVAO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndexBuffer); 
 	glDrawElements(GL_TRIANGLES, 36 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);

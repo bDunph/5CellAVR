@@ -51,8 +51,8 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 
 	//glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 //******************************************************************************************
 // Matrices & Light Positions
@@ -66,8 +66,8 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 
 	// variables for view matrix
 	//cameraPos = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	//cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	//cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	//model matrix
 	modelMatrix = glm::mat4(1.0f);
@@ -85,6 +85,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 		return false;
 	}
 	
+
 //*************************************************************************************************
 
 //***************************************************************************************************
@@ -380,14 +381,14 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 //***********************************************************************************************************
 
 	//workaround for macOS Mojave bug
-	needDraw = true;
+	//needDraw = true;
 
-	radius = 0.75f;
+	//radius = 0.75f;
 	
 	return true;
 }
 
-void FiveCell::update(glm::mat4& projMat, glm::mat4& viewMat){
+void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat){
 
 //***********************************************************************************************************
 // Update Stuff Here
@@ -406,14 +407,14 @@ void FiveCell::update(glm::mat4& projMat, glm::mat4& viewMat){
 
 		//float rotVal = glm::radians(45.0f);
 		//rotation around W axis
-		glm::mat4 rotationZW = glm::mat4(
+		rotationZW = glm::mat4(
 			1.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, cos(glfwGetTime() * 0.2f), -sin(glfwGetTime() * 0.2f),
 			0.0f, 0.0f, sin(glfwGetTime() * 0.2f), cos(glfwGetTime() * 0.2f)
 		);
 	
-		glm::mat4 rotationXW = glm::mat4(	
+		rotationXW = glm::mat4(	
 			cos(glfwGetTime() * 0.2f), 0.0f, 0.0f, sin(glfwGetTime() * 0.2f),
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f, 
@@ -437,7 +438,7 @@ void FiveCell::update(glm::mat4& projMat, glm::mat4& viewMat){
 
 			//calculate azimuth and elevation values for hrtf
 		
-			glm::vec3 viewerPos = cameraPos * cameraFront;
+			glm::vec3 viewerPos = cameraPos;
 			glm::vec3 soundPos = glm::vec3(pos); 
 	
 			//distance
@@ -471,7 +472,7 @@ void FiveCell::update(glm::mat4& projMat, glm::mat4& viewMat){
 		
 }
 
-void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, glm::mat4& projMat, glm::mat4& viewEyeMat){
+void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, glm::mat4 projMat, glm::mat4 viewEyeMat){
 		
 //**********************************************************************************************************
 // Draw Stuff Here
@@ -495,7 +496,7 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
       		//glUniformMatrix4fv(rotationZWLoc, 1, GL_FALSE, &rotationZW[0][0]);
 		//glUniformMatrix4fv(rotationXWLoc, 1, GL_FALSE, &rotationXW[0][0]);
 		//glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-		//glUniform3f(light2PosLoc, lightPos2.x, lightPos2.y, lightPos2.z);
+		//glUniform3f(light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
 		//glUniform3f(cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
 		//glUniform1f(alphaLoc, a);
 
@@ -545,27 +546,28 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 		//glBindVertexArray(0);
 
 		// draw ground plane second 
-		//glDepthFunc(GL_LESS);
+		glDepthFunc(GL_LESS);
 
-		//glBindVertexArray(groundVAO);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, groundIndexBuffer); 
-		//glUseProgram(groundPlaneProg);
+		glBindVertexArray(groundVAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, groundIndexBuffer); 
+		glUseProgram(groundPlaneProg);
 
-		//glUniformMatrix4fv(ground_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
-		//glUniformMatrix4fv(ground_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
-		//glUniformMatrix4fv(ground_modelMatLoc, 1, GL_FALSE, &groundModelMatrix[0][0]);
-		//glUniform3f(ground_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-		//glUniform3f(ground_light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
-		//glUniform3f(ground_cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
+		glUniformMatrix4fv(ground_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+		glUniformMatrix4fv(ground_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
+		glUniformMatrix4fv(ground_modelMatLoc, 1, GL_FALSE, &groundModelMatrix[0][0]);
+		glUniform3f(ground_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+		glUniform3f(ground_light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
+		glUniform3f(ground_cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
 
-		//glDrawElements(GL_TRIANGLES, 6 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//glBindVertexArray(0);
+		glDrawElements(GL_TRIANGLES, 6 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
 
-		////draw sound test objects
+		//draw sound test objects
 		//for(int i = 0; i < _countof(soundObjects); i++){
 		//	soundObjects[i].draw(projMat, viewEyeMat, lightPos, light2Pos, camPosPerEye, soundObjProg);
-		//}
+		//}	
+
 		//update other events like input handling
 		//glfwPollEvents();
 

@@ -17,7 +17,7 @@ public:
 private:
 	GLuint skyboxShaderProg;
 	GLuint skyboxVAO;	
-	unsigned int skyboxTexID;
+	GLuint skyboxTexID;
 	GLuint skyboxIndexBuffer;
 
 	GLint skybox_projMatLoc;

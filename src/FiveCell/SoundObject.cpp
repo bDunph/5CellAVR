@@ -117,7 +117,7 @@ bool SoundObject::setup(){
 	return true;
 }
 
-void SoundObject::update(glm::vec3 &translationVal){
+void SoundObject::update(glm::vec3 translationVal){
 
 	float soundModelRotAngle = glfwGetTime() * 0.2f;
 	glm::mat4 rotateSoundModel = glm::rotate(identityModelMat, soundModelRotAngle, glm::vec3(0, 1, 0));;
@@ -126,7 +126,7 @@ void SoundObject::update(glm::vec3 &translationVal){
 	soundModelMatrix = translateMat * rotateSoundModel * scaleMat;
 }
 
-void SoundObject::draw(glm::mat4 &projMat, glm::mat4 &viewMat, glm::vec3 &lightPosition, glm::vec3 &light2Position, glm::vec3 cameraPosition, GLuint soundObjProg){
+void SoundObject::draw(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 lightPosition, glm::vec3 light2Position, glm::vec3 cameraPosition, GLuint soundObjProg){
 
 	glEnable(GL_CULL_FACE);
 	glBindVertexArray(soundVAO);

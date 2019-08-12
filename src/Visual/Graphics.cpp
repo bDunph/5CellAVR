@@ -127,13 +127,36 @@ bool Graphics::BInitGL(std::unique_ptr<VR_Manager>& vrm, bool fullscreen){
 	//tell GL only to draw onto a pixel if a shape is closer to the viewer
 	glEnable(GL_DEPTH_TEST);//enable depth testing
 	glDepthFunc(GL_LESS);//depth testing interprets a smaller value as 'closer'
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// setup scene geometry
 	skyboxShaderProg = BCreateSceneShaders("skybox");
+	if(skyboxShaderProg == NULL){
+		std::cout << "skyboxShaderProg returned NULL: Graphics::BInitGL" << std::endl;
+		return false;
+	}
 	soundObjShaderProg = BCreateSceneShaders("soundObj");
+	if(soundObjShaderProg == NULL){
+		std::cout << "soundObjShaderProg returned NULL: Graphics::BInitGL" << std::endl;
+		return false;
+	}
 	groundPlaneShaderProg = BCreateSceneShaders("groundPlane");
+	if(groundPlaneShaderProg == NULL){
+		std::cout << "groundPlaneShaderProg returned NULL: Graphics::BInitGL" << std::endl;
+		return false;
+	}
 	fiveCellShaderProg = BCreateSceneShaders("rasterPolychoron");
-	fiveCell.setup("mode5cell.csd", skyboxShaderProg, soundObjShaderProg, groundPlaneShaderProg, fiveCellShaderProg);	
+	if(fiveCellShaderProg == NULL){
+		std::cout << "fiveCellShaderProg returned NULL: Graphics::BInitGL" << std::endl;
+		return false;
+	}
+
+	if(!fiveCell.setup("mode5cell.csd", skyboxShaderProg, soundObjShaderProg, groundPlaneShaderProg, fiveCellShaderProg)) {
+		std::cout << "fiveCell setup failed: Graphics BInitGL" << std::endl;
+		return false;
+	}
+
 	return true;
 }
 
@@ -469,7 +492,7 @@ void Graphics::RenderFrame(std::unique_ptr<VR_Manager>& vrm)
 
 	
 	//update values from controller actions
-	if(vrm->BGetRotate3DTrigger()) IncreaseRotationValue(m_pRotationVal);
+	//if(vrm->BGetRotate3DTrigger()) IncreaseRotationValue(m_pRotationVal);
 
 	// for now as fast as possible
 	if ( vrm->m_pHMD )
@@ -686,7 +709,7 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
 	glm::mat4 currentProjMatrix = vrm->GetCurrentProjectionMatrix(nEye);
 	glm::mat4 currentViewMatrix = vrm->GetCurrentViewMatrix(nEye);
