@@ -173,17 +173,18 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//setup texture buffer
+	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &skyboxTexID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexID);
 
 	//load textures
 	std::vector<std::string> textureNames;
-	textureNames.push_back("misty_ft.tga");
-	textureNames.push_back("misty_bk.tga");
-	textureNames.push_back("misty_up.tga");
-	textureNames.push_back("misty_dn.tga");
-	textureNames.push_back("misty_rt.tga");
-	textureNames.push_back("misty_lf.tga");
+	textureNames.push_back("misty_ft.jpg");
+	textureNames.push_back("misty_bk.jpg");
+	textureNames.push_back("misty_up.jpg");
+	textureNames.push_back("misty_dn.jpg");
+	textureNames.push_back("misty_rt.jpg");
+	textureNames.push_back("misty_lf.jpg");
 
 	//std::string name1 = texName.append("_rt.tga");
 	//textureNames.push_back(name1);
@@ -205,6 +206,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 		data = stbi_load(textureNames[i].c_str(), &width, &height, &numChannels, 0);
 		if(data){
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			
 			stbi_image_free(data);
 		} else {
 			std::cout << "ERROR: Cubemap not loaded" << std::endl;
@@ -219,6 +221,8 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);  	
 
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
 	glGenBuffers(1, &skyboxIndexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned int), skyboxIndices, GL_STATIC_DRAW);
@@ -227,6 +231,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 	//uniform setup
 	skybox_projMatLoc = glGetUniformLocation(skyboxShaderProg, "projMat");
 	skybox_viewMatLoc = glGetUniformLocation(skyboxShaderProg, "viewMat");
+	skybox_texUniformLoc = glGetUniformLocation(skyboxShaderProg, "skybox");
 
 	glBindVertexArray(0);
 
@@ -629,12 +634,15 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 		glDepthFunc(GL_LEQUAL);
 		glDepthMask(GL_FALSE);
 		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndexBuffer); 
 		glUseProgram(skyboxProg);
+		glUniform1i(skybox_texUniformLoc, 0);
 		glUniformMatrix4fv(skybox_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
 		glUniformMatrix4fv(skybox_viewMatLoc, 1, GL_FALSE, &viewNoTranslation[0][0]);
 		glDrawElements(GL_TRIANGLES, 36 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 		glDepthMask(GL_TRUE);
@@ -705,22 +713,22 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 		//glBindVertexArray(0);
 
 		// draw ground plane second 
-		glDepthFunc(GL_LESS);
+		//glDepthFunc(GL_LESS);
 
-		glBindVertexArray(groundVAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, groundIndexBuffer); 
-		glUseProgram(groundPlaneProg);
+		//glBindVertexArray(groundVAO);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, groundIndexBuffer); 
+		//glUseProgram(groundPlaneProg);
 
-		glUniformMatrix4fv(ground_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
-		glUniformMatrix4fv(ground_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
-		glUniformMatrix4fv(ground_modelMatLoc, 1, GL_FALSE, &groundModelMatrix[0][0]);
-		glUniform3f(ground_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-		glUniform3f(ground_light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
-		glUniform3f(ground_cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
+		//glUniformMatrix4fv(ground_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+		//glUniformMatrix4fv(ground_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
+		//glUniformMatrix4fv(ground_modelMatLoc, 1, GL_FALSE, &groundModelMatrix[0][0]);
+		//glUniform3f(ground_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+		//glUniform3f(ground_light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
+		//glUniform3f(ground_cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
 
-		glDrawElements(GL_TRIANGLES, 6 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
+		//glDrawElements(GL_TRIANGLES, 6 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		//glBindVertexArray(0);
 
 		//draw sound test objects
 		//for(int i = 0; i < _countof(soundObjects); i++){

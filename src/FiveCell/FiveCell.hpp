@@ -91,6 +91,7 @@ private:
 
 	GLint skybox_projMatLoc;
 	GLint skybox_viewMatLoc;
+	GLint skybox_texUniformLoc;
 
 	//Csound
 	CsoundSession *session;
