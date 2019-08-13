@@ -83,8 +83,15 @@ private:
 	SoundObject soundObjects [5];
 
 	//Skybox
-	Skybox skybox;
-	
+	//Skybox skybox;
+	GLuint skyboxShaderProg;
+	GLuint skyboxVAO;	
+	GLuint skyboxTexID;
+	GLuint skyboxIndexBuffer;
+
+	GLint skybox_projMatLoc;
+	GLint skybox_viewMatLoc;
+
 	//Csound
 	CsoundSession *session;
 };

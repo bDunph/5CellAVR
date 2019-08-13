@@ -148,27 +148,21 @@ bool Skybox::setup(){
 	skybox_viewMatLoc = glGetUniformLocation(skyboxShaderProg, "viewMat");
 
 	glBindVertexArray(0);
-	
-	glm::vec3 trans = glm::vec3(0.0f, 2.0f, 0.0f);
-	glm::vec3 scale = glm::vec3(0.1f, 0.1f, 0.1f);
-	glm::mat4 identityModelMatrix = glm::mat4(1.0f);
-	glm::mat4 scaleMat = glm::scale(identityModelMatrix, scale);
-	glm::mat4 translateMat = glm::translate(identityModelMatrix, trans);
-	glm::mat4 skyboxModelMatrix = translateMat * scaleMat;
-	
+		
 	return true;
 }
 
-void Skybox::draw(glm::mat4 projMat, glm::mat4 viewEyeMat, GLuint skyboxProg){
+void Skybox::draw(glm::mat4 projMatSkybox, glm::mat4 viewEyeMatSkybox, GLuint skyboxProg){
 
-	glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(viewEyeMat));
+	glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(viewEyeMatSkybox));
 
 	glDepthFunc(GL_LEQUAL);
 	glDepthMask(GL_FALSE);
 	glBindVertexArray(skyboxVAO);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndexBuffer); 
 	glUseProgram(skyboxProg);
-	glUniformMatrix4fv(skybox_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+	glUniformMatrix4fv(skybox_projMatLoc, 1, GL_FALSE, &projMatSkybox[0][0]);
 	glUniformMatrix4fv(skybox_viewMatLoc, 1, GL_FALSE, &viewNoTranslation[0][0]);
 	glDrawElements(GL_TRIANGLES, 36 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

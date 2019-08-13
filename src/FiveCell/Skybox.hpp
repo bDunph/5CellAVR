@@ -12,7 +12,7 @@ class Skybox {
 public:
 
 	bool setup();
-	void draw(glm::mat4 projMat, glm::mat4 viewMat, GLuint skyboxProg);
+	void draw(glm::mat4 projMatSkybox, glm::mat4 viewEyeMatSkybox, GLuint skyboxProg);
 
 private:
 	GLuint skyboxShaderProg;
