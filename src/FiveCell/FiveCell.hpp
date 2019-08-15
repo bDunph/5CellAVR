@@ -20,9 +20,9 @@
 class FiveCell {
 
 public:
-	bool setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GLuint groundPlaneProg, GLuint fiveCellProg);
+	bool setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GLuint groundPlaneProg, GLuint fiveCellProg, GLuint quadShaderProg);
 	void update(glm::mat4 projMat, glm::mat4 viewMat);
-	void draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, glm::mat4 projMat, glm::mat4 viewEyeMat);
+	void draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, GLuint quadShaderProg, glm::mat4 projMat, glm::mat4 viewEyeMat);
 	void exit();
 
 private:
@@ -74,6 +74,7 @@ private:
 	glm::mat4 scale5CellMatrix;
 	glm::mat4 fiveCellModelMatrix;
 	glm::mat4 groundModelMatrix;
+	glm::mat4 quadModelMatrix;
 
 	//lights
 	glm::vec3 lightPos;
@@ -92,6 +93,18 @@ private:
 	GLint skybox_projMatLoc;
 	GLint skybox_viewMatLoc;
 	GLint skybox_texUniformLoc;
+
+	//quad
+	GLuint quadVAO;
+	GLuint quadIndexBuffer;
+	unsigned int quadTexID;
+
+	GLint quad_projMatLoc;
+	GLint quad_viewMatLoc;
+	GLint quad_modelMatLoc;
+	GLint quad_lightPosLoc;
+	GLint quad_light2PosLoc;
+	GLint quad_cameraPosLoc;
 
 	//Csound
 	CsoundSession *session;

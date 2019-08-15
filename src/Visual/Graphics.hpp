@@ -149,7 +149,19 @@ private:
 	GLuint soundObjShaderProg;
 	GLuint groundPlaneShaderProg;
 	GLuint fiveCellShaderProg;
+	GLuint quadShaderProg;
 
 	FiveCell fiveCell;
+	
+	//quad
+	//glm::mat4 quadModelMatrix;
+	//GLuint quadVAO;
+	//GLuint quadIndexBuffer;
+	//unsigned int quadTexID;
+
+	//GLint quad_projMatLoc;
+	//GLint quad_viewMatLoc;
+	//GLint quad_modelMatLoc;
+
 };
 #endif

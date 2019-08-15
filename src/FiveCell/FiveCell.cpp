@@ -9,6 +9,7 @@
 #include <math.h>
 #include <cmath>
 #include <iostream>
+#include "stb_image.h"
 
 //#include "log.h"
 //#include "shader_manager.h"
@@ -20,10 +21,8 @@
 #define _countof(x) (sizeof(x)/sizeof((x)[0]))
 #endif
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
-bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GLuint groundPlaneProg, GLuint fiveCellProg){
+bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GLuint groundPlaneProg, GLuint fiveCellProg, GLuint quadShaderProg){
 
 //************************************************************
 //Csound performance thread
@@ -173,18 +172,18 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//setup texture buffer
-	glActiveTexture(GL_TEXTURE0);
+	//glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &skyboxTexID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexID);
 
 	//load textures
 	std::vector<std::string> textureNames;
-	textureNames.push_back("misty_ft.jpg");
-	textureNames.push_back("misty_bk.jpg");
-	textureNames.push_back("misty_up.jpg");
-	textureNames.push_back("misty_dn.jpg");
-	textureNames.push_back("misty_rt.jpg");
-	textureNames.push_back("misty_lf.jpg");
+	textureNames.push_back("misty_ft.tga");
+	textureNames.push_back("misty_bk.tga");
+	textureNames.push_back("misty_up.tga");
+	textureNames.push_back("misty_dn.tga");
+	textureNames.push_back("misty_rt.tga");
+	textureNames.push_back("misty_lf.tga");
 
 	//std::string name1 = texName.append("_rt.tga");
 	//textureNames.push_back(name1);
@@ -221,7 +220,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);  	
 
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	//glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 	glGenBuffers(1, &skyboxIndexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndexBuffer);
@@ -250,6 +249,168 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 	
 //*************************************************************************************************
 			
+//***********************************************************************************************
+// Quad to test texture rendering
+//***********************************************************************************************
+
+	//vertices
+	//float quadVerts [20] = {
+	//	//positions		//texCoords
+	//	-1.0f, 1.0f, 0.0f,	-1.0f, 1.0f,
+	//	-1.0f, -1.0f, 0.0f,	-1.0f, -1.0f,
+	//	1.0f, -1.0f, 0.0f,	1.0f, -1.0f,
+	//	1.0f, 1.0f, 0.0f,	1.0f, 1.0f
+	//};
+	
+	//float quadVerts [12] = {
+	//	//positions		
+	//	-1.0f, 1.0f, 0.0f,		
+	//	-1.0f, -1.0f, 0.0f,	
+	//	1.0f, -1.0f, 0.0f,	
+	//	1.0f, 1.0f, 0.0f	
+	//};
+
+	////indices
+	//unsigned int quadIndices [6] = {
+	//	0, 1, 2,
+	//	0, 2, 3
+	//};
+	
+	float quadVerts [24] = {
+		//top left front	
+		-1.0f, 1.0f, 1.0f,
+		//bottom left front
+		-1.0f, -1.0f, 1.0f,
+		//bottom right front
+		1.0f, -1.0f, 1.0f,
+		//top right front
+		1.0f, 1.0f, 1.0f,
+		//top left back
+		-1.0f, 1.0f, -1.0f,
+		//bottom left back
+		-1.0f, -1.0f, -1.0f,
+		//bottom right back
+		1.0f, -1.0f, -1.0f,
+		//top right back
+		1.0f, 1.0f, -1.0f
+	};
+
+	unsigned int quadIndices [36] = {
+		//front face
+		0, 1, 2,
+		0, 2, 3,
+		//right face
+		3, 2, 6,
+		3, 6, 7,
+		//back face
+		7, 6, 5,
+		7, 5, 4,
+		//left face
+		4, 5, 1,
+		4, 1, 0,
+		//bottom face
+		1, 5, 6,
+		1, 6, 2,
+		//top face
+		4, 0, 3,
+		4, 3, 7
+	};
+
+	float quadNormals [24] = {
+		//top front left
+		-1.0f, 1.0f, 1.0f,
+		//bottom front left
+		-1.0f, -1.0f, 1.0f,
+		//bottom front right
+		1.0f, -1.0f, 1.0f,
+		//top front right
+		1.0f, 1.0f, 1.0f,
+		//top left back
+		-1.0f, 1.0f, -1.0f,
+		//bottom left back
+		-1.0f, -1.0f, -1.0f,
+		//bottom right back
+		1.0f, -1.0f, -1.0f,
+		//top right back
+		1.0f, 1.0f, -1.0f
+	};
+	//Set up ground plane buffers
+	glGenVertexArrays(1, &quadVAO);
+	glBindVertexArray(quadVAO);
+
+	GLuint quadVBO;
+	//glGenBuffers(1, &quadVBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	//glBufferData(GL_ARRAY_BUFFER, 20 * sizeof(float), quadVerts, GL_STATIC_DRAW);
+
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(0));
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+	glGenBuffers(1, &quadVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), quadVerts, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(0));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	GLuint quadNormalVBO;
+	glGenBuffers(1, &quadNormalVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadNormalVBO);
+	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), quadNormals, GL_STATIC_DRAW);
+	
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 24 * sizeof(float), (void*)(0));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//glGenTextures(1, &quadTexID);
+	//glBindTexture(GL_TEXTURE_2D, quadTexID);
+
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//
+	////load texture
+	//int texWidth;
+	//int texHeight;
+	//int texChnls;
+	//unsigned char* texData;
+        //texData	= stbi_load("misty_ft.tga", &texWidth, &texHeight, &texChnls, 0);
+	//if(texData){
+	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+	//	glGenerateMipmap(GL_TEXTURE_2D);
+	//} else {
+	//	std::cout << "Failed to load quad texture" << std::endl;
+	//}
+	//stbi_image_free(texData);
+
+	glGenBuffers(1, &quadIndexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIndexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned int), quadIndices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	
+	//uniform setup
+	quad_projMatLoc = glGetUniformLocation(quadShaderProg, "projMat");
+	quad_viewMatLoc = glGetUniformLocation(quadShaderProg, "viewMat");
+	quad_modelMatLoc = glGetUniformLocation(quadShaderProg, "quadModelMat");
+
+	quad_lightPosLoc = glGetUniformLocation(quadShaderProg, "lightPos");
+	quad_light2PosLoc = glGetUniformLocation(quadShaderProg, "light2Pos");
+
+	quad_cameraPosLoc = glGetUniformLocation(quadShaderProg, "camPos");
+	
+	glBindVertexArray(0);
+
+	glm::vec3 scaleQuad = glm::vec3(20.0f, 20.0f, 0.0f);
+	glm::mat4 scaleQuadMatrix = glm::scale(modelMatrix, scaleQuad);
+
+	quadModelMatrix = modelMatrix;
+
+
 //**************************************************************************************************
 //	Ground Plane Setup
 //*********************************************************************************************
@@ -621,37 +782,42 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat){
 		
 }
 
-void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, glm::mat4 projMat, glm::mat4 viewEyeMat){
+void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, GLuint quadShaderProg, glm::mat4 projMat, glm::mat4 viewEyeMat){
 		
 //**********************************************************************************************************
 // Draw Stuff Here
 //*********************************************************************************************************
 
+		camPosPerEye = glm::vec3(viewEyeMat[3][0], viewEyeMat[3][1], viewEyeMat[3][2]);
+		
 		//draw skybox
 		//skybox.draw(projMat, viewEyeMat, skyboxProg);
-		glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(viewEyeMat));
+		//glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(viewEyeMat));
 
-		glDepthFunc(GL_LEQUAL);
-		glDepthMask(GL_FALSE);
-		glBindVertexArray(skyboxVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexID);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndexBuffer); 
-		glUseProgram(skyboxProg);
-		glUniform1i(skybox_texUniformLoc, 0);
-		glUniformMatrix4fv(skybox_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
-		glUniformMatrix4fv(skybox_viewMatLoc, 1, GL_FALSE, &viewNoTranslation[0][0]);
-		glDrawElements(GL_TRIANGLES, 36 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		glDepthMask(GL_TRUE);
+		//glDepthFunc(GL_LEQUAL);
+		//glDepthMask(GL_FALSE);
 
-		glDepthFunc(GL_LESS);
+		//glUseProgram(skyboxProg);
+		//glUniform1i(skybox_texUniformLoc, 0);
+		//glUniformMatrix4fv(skybox_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+		//glUniformMatrix4fv(skybox_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
+
+		//glBindVertexArray(skyboxVAO);
+		////glActiveTexture(GL_TEXTURE0);
+		////glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexID);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndexBuffer); 
+
+		//glDrawElements(GL_TRIANGLES, 36 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+
+		////glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		//glBindVertexArray(0);
+	
+		//glDepthMask(GL_TRUE);
+		//glDepthFunc(GL_LESS);
 		
 		//draw 4D polytope	
 		//float a = 0.0f;
-		//camPosPerEye = glm::vec3(viewEyeMat[3][0], viewEyeMat[3][1], viewEyeMat[3][2]);
 
 		//glBindVertexArray(vao);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
@@ -729,6 +895,22 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 		//glDrawElements(GL_TRIANGLES, 6 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		//glBindVertexArray(0);
+	
+		//draw texture quad
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIndexBuffer); 
+		glUseProgram(quadShaderProg);
+
+		glUniformMatrix4fv(quad_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+		glUniformMatrix4fv(quad_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
+		glUniformMatrix4fv(quad_modelMatLoc, 1, GL_FALSE, &quadModelMatrix[0][0]);
+		glUniform3f(quad_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+		glUniform3f(quad_light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
+		glUniform3f(quad_cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
+
+		glDrawElements(GL_TRIANGLES, 6 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
 
 		//draw sound test objects
 		//for(int i = 0; i < _countof(soundObjects); i++){

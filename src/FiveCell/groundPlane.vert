@@ -14,7 +14,7 @@ void main(){
 	float scaledPosX = position.x * 100.0;
 	float scaledPosZ = position.z * 100.0;
  
-	gl_Position = projMat * viewMat * groundModelMat * vec4(scaledPosX, position.y, scaledPosZ, 1.0);;	
+	gl_Position = projMat * viewMat * groundModelMat * vec4(scaledPosX, position.y, scaledPosZ, 1.0);	
 	//gl_Position = projMat * viewMat * groundModelMat * vec4(position, 1.0);
 
 	fragPos_worldSpace = vec3(groundModelMat * vec4(position, 1.0)).xyz;  	

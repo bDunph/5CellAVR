@@ -151,11 +151,112 @@ bool Graphics::BInitGL(std::unique_ptr<VR_Manager>& vrm, bool fullscreen){
 		std::cout << "fiveCellShaderProg returned NULL: Graphics::BInitGL" << std::endl;
 		return false;
 	}
+	quadShaderProg = BCreateSceneShaders("quad");
+	if(quadShaderProg == NULL){
+		std::cout << "quadShaderProg returned NULL: Graphics::BInitGL" << std::endl;
+		return false;
+	}
 
-	if(!fiveCell.setup("mode5cell.csd", skyboxShaderProg, soundObjShaderProg, groundPlaneShaderProg, fiveCellShaderProg)) {
+	if(!fiveCell.setup("mode5cell.csd", skyboxShaderProg, soundObjShaderProg, groundPlaneShaderProg, fiveCellShaderProg, quadShaderProg)) {
 		std::cout << "fiveCell setup failed: Graphics BInitGL" << std::endl;
 		return false;
 	}
+
+//***********************************************************************************************
+// Quad to test texture rendering
+//***********************************************************************************************
+
+	//vertices
+	//float quadVerts [20] = {
+	//	//positions		//texCoords
+	//	-1.0f, 1.0f, 0.0f,	-1.0f, 1.0f,
+	//	-1.0f, -1.0f, 0.0f,	-1.0f, -1.0f,
+	//	1.0f, -1.0f, 0.0f,	1.0f, -1.0f,
+	//	1.0f, 1.0f, 0.0f,	1.0f, 1.0f
+	//};
+	
+	//float quadVerts [12] = {
+	//	//positions		
+	//	-1.0f, 1.0f, 0.0f,	
+	//	-1.0f, -1.0f, 0.0f,	
+	//	1.0f, -1.0f, 0.0f,	
+	//	1.0f, 1.0f, 0.0f	
+	//};
+
+	////indices
+	//unsigned int quadIndices [6] = {
+	//	0, 1, 2,
+	//	0, 2, 3
+	//};
+	//
+	////Set up ground plane buffers
+	//glGenVertexArrays(1, &quadVAO);
+	//glBindVertexArray(quadVAO);
+
+	//GLuint quadVBO;
+	////glGenBuffers(1, &quadVBO);
+	////glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	////glBufferData(GL_ARRAY_BUFFER, 20 * sizeof(float), quadVerts, GL_STATIC_DRAW);
+
+	////glEnableVertexAttribArray(0);
+	////glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(0));
+	////glEnableVertexAttribArray(1);
+	////glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	////glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//
+	//glGenBuffers(1, &quadVBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	//glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(float), quadVerts, GL_STATIC_DRAW);
+
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(0));
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	////glGenTextures(1, &quadTexID);
+	////glBindTexture(GL_TEXTURE_2D, quadTexID);
+
+	////glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	////glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	////glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	////glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	////
+	//////load texture
+	////int texWidth;
+	////int texHeight;
+	////int texChnls;
+	////unsigned char* texData;
+        ////texData	= stbi_load("misty_ft.tga", &texWidth, &texHeight, &texChnls, 0);
+	////if(texData){
+	////	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+	////	glGenerateMipmap(GL_TEXTURE_2D);
+	////} else {
+	////	std::cout << "Failed to load quad texture" << std::endl;
+	////}
+	////stbi_image_free(texData);
+
+	//glGenBuffers(1, &quadIndexBuffer);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIndexBuffer);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), quadIndices, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//
+	////uniform setup
+	//quad_projMatLoc = glGetUniformLocation(quadShaderProg, "projMat");
+	//quad_viewMatLoc = glGetUniformLocation(quadShaderProg, "viewMat");
+	//quad_modelMatLoc = glGetUniformLocation(quadShaderProg, "quadModelMat");
+
+	////ground_lightPosLoc = glGetUniformLocation(quadShaderProg, "lightPos");
+	////ground_light2PosLoc = glGetUniformLocation(quadShaderProg, "light2Pos");
+
+	////ground_cameraPosLoc = glGetUniformLocation(quadShaderProg, "camPos");
+	//
+	//glBindVertexArray(0);
+
+	//glm::mat4 modelMatrix = glm::mat4(1.0f);
+	//glm::vec3 scaleQuad = glm::vec3(20.0f, 20.0f, 0.0f);
+	//glm::mat4 scaleQuadMatrix = glm::scale(modelMatrix, scaleQuad);
+
+	//quadModelMatrix = scaleQuadMatrix;
+
 
 	return true;
 }
@@ -663,7 +764,7 @@ void Graphics::RenderControllerAxes(std::unique_ptr<VR_Manager>& vrm)
 //-----------------------------------------------------------------------------
 void Graphics::RenderStereoTargets(std::unique_ptr<VR_Manager>& vrm)
 {
-	glClearColor(0.87, 0.85, 0.75, 0.95);
+	//glClearColor(0.87, 0.85, 0.75, 0.95);
 	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_MULTISAMPLE);
 
@@ -708,8 +809,9 @@ void Graphics::RenderStereoTargets(std::unique_ptr<VR_Manager>& vrm)
 void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 {
 
+	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 
 	glm::mat4 currentProjMatrix = vrm->GetCurrentProjectionMatrix(nEye);
 	glm::mat4 currentViewMatrix = vrm->GetCurrentViewMatrix(nEye);
@@ -717,11 +819,27 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 	glm::mat4 viewEyeMatrix = currentEyeMatrix * currentViewMatrix;
 	glm::mat4 viewEyeProjMatrix = currentProjMatrix * currentEyeMatrix * currentViewMatrix;
 
+	////draw texture quad
+	//glBindVertexArray(quadVAO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIndexBuffer); 
+	//glUseProgram(quadShaderProg);
+
+	//glUniformMatrix4fv(quad_projMatLoc, 1, GL_FALSE, &currentProjMatrix[0][0]);
+	//glUniformMatrix4fv(quad_viewMatLoc, 1, GL_FALSE, &viewEyeMatrix[0][0]);
+	//glUniformMatrix4fv(quad_modelMatLoc, 1, GL_FALSE, &quadModelMatrix[0][0]);
+	////glUniform3f(ground_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+	////glUniform3f(ground_light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
+	////glUniform3f(ground_cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
+
+	//glDrawElements(GL_TRIANGLES, 6 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
+
 	//update variables for fiveCell
-	fiveCell.update(currentProjMatrix, currentViewMatrix);
+	//fiveCell.update(currentProjMatrix, currentViewMatrix);
 
 	//draw fiveCell scene
-	fiveCell.draw(skyboxShaderProg, groundPlaneShaderProg, soundObjShaderProg, fiveCellShaderProg, currentProjMatrix, viewEyeMatrix);
+	fiveCell.draw(skyboxShaderProg, groundPlaneShaderProg, soundObjShaderProg, fiveCellShaderProg, quadShaderProg, currentProjMatrix, viewEyeMatrix);
 
 	bool bIsInputAvailable = vrm->m_pHMD->IsInputAvailable();
 

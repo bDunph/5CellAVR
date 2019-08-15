@@ -3,13 +3,18 @@
 uniform vec3 lightPos;
 uniform vec3 light2Pos;
 uniform vec3 camPos;
+//uniform sampler2D texSampler;
 
 in vec3 fragPos_worldSpace;
 in vec3 normal_worldSpace;
+//in vec2 texCoord;
 
 out vec4 colour_out;
 
 void main(){
+
+	//colour_out = texture(texSampler, texCoord);
+	//colour_out = vec4(1.0, 0.0, 0.0, 1.0);
 
 	float specularStrength = 0.2;
 	vec3 lightColour = vec3(1.0, 1.0, 1.0);
@@ -43,4 +48,4 @@ void main(){
 
 	colour_out = vec4(result + result2, 0.4);
 
-} 
+}
