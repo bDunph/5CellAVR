@@ -839,7 +839,7 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 	//fiveCell.update(currentProjMatrix, currentViewMatrix);
 
 	//draw fiveCell scene
-	fiveCell.draw(skyboxShaderProg, groundPlaneShaderProg, soundObjShaderProg, fiveCellShaderProg, quadShaderProg, currentProjMatrix, viewEyeMatrix);
+	fiveCell.draw(skyboxShaderProg, groundPlaneShaderProg, soundObjShaderProg, fiveCellShaderProg, quadShaderProg, currentProjMatrix, viewEyeMatrix, currentViewMatrix, currentEyeMatrix);
 
 	bool bIsInputAvailable = vrm->m_pHMD->IsInputAvailable();
 
