@@ -1,7 +1,7 @@
 #version 410
 
-//uniform vec3 lightPos;
-//uniform vec3 light2Pos;
+uniform vec3 lightPos;
+uniform vec3 light2Pos;
 uniform vec3 camPos;
 uniform samplerCube skybox;
 

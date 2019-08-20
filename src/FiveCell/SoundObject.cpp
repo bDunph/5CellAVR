@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-bool SoundObject::setup(){
+bool SoundObject::setup(GLuint soundObjProg){
 
 		//Sound source vertices
 	float soundVerts [24] = {
@@ -71,7 +71,7 @@ bool SoundObject::setup(){
 		1.0f, 1.0f, -1.0f
 	};	
 
-	//Set up ground plane buffers
+	//Set up soundobj buffers
 	glGenVertexArrays(1, &soundVAO);
 	glBindVertexArray(soundVAO);
 
@@ -99,14 +99,14 @@ bool SoundObject::setup(){
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	//uniform setup
-	soundObj_projMatLoc = glGetUniformLocation(soundObjShaderProg, "projMat");
-	soundObj_viewMatLoc = glGetUniformLocation(soundObjShaderProg, "viewMat");
-	soundObj_modelMatLoc = glGetUniformLocation(soundObjShaderProg, "soundModelMat");
+	soundObj_projMatLoc = glGetUniformLocation(soundObjProg, "projMat");
+	soundObj_viewMatLoc = glGetUniformLocation(soundObjProg, "viewMat");
+	soundObj_modelMatLoc = glGetUniformLocation(soundObjProg, "soundModelMat");
 
-	soundObj_lightPosLoc = glGetUniformLocation(soundObjShaderProg, "lightPos");
-	soundObj_light2PosLoc = glGetUniformLocation(soundObjShaderProg, "light2Pos");
+	soundObj_lightPosLoc = glGetUniformLocation(soundObjProg, "lightPos");
+	soundObj_light2PosLoc = glGetUniformLocation(soundObjProg, "light2Pos");
 
-	soundObj_cameraPosLoc = glGetUniformLocation(soundObjShaderProg, "camPos");
+	soundObj_cameraPosLoc = glGetUniformLocation(soundObjProg, "camPos");
 	
 	glBindVertexArray(0);
 	

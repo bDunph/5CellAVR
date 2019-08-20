@@ -2,7 +2,7 @@
 #define FIVE_CELL_HPP
 
 //#include "Skybox.hpp"
-//#include "SoundObject.hpp"
+#include "SoundObject.hpp"
 //#include "CsoundSession.hpp"
 
 #include <string>
@@ -23,19 +23,19 @@ class FiveCell {
 
 public:
 	bool setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GLuint groundPlaneProg, GLuint fiveCellProg, GLuint quadShaderProg);
-	//void update(glm::mat4 projMat, glm::mat4 viewMat);
+	void update(glm::mat4 projMat, glm::mat4 viewMat, glm::mat4 viewEyeMat);
 	void draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, GLuint quadShaderProg, glm::mat4 projMat, glm::mat4 viewEyeMat, glm::mat4 viewMat, glm::mat4 eyeMat);
 	void exit();
 
 private:
 
-	//glm::vec3 cameraPos;
-	//glm::vec3 camPosPerEye;
+	glm::vec3 cameraPos;
+	glm::vec3 camPosPerEye;
 	//glm::vec3 cameraFront;
 	//glm::vec3 cameraUp;
-	//float deltaTime;
-	//float lastFrame;
-	//float currentFrame;
+	float deltaTime;
+	float lastFrame;
+	float currentFrame;
 	//bool needDraw;
 	//float radius;
 
@@ -53,38 +53,38 @@ private:
 	//GLint ground_cameraPosLoc;
 	
 	//fivecell 
-	//glm::vec4 vertArray[5];
-	//GLuint vao;
-	//GLuint index;
-	//GLuint lineIndex;
+	glm::vec4 vertArray[5];
+	GLuint vao;
+	GLuint index;
+	GLuint lineIndex;
 
-	//GLint projMatLoc;
-	//GLint viewMatLoc;
-	//GLint fiveCellModelMatLoc;
-	//GLint rotationZWLoc;
-	//GLint rotationXWLoc;
-	//GLint lightPosLoc;
-	//GLint light2PosLoc;
-	//GLint alphaLoc;	
-	//GLint cameraPosLoc;
+	GLint projMatLoc;
+	GLint viewMatLoc;
+	GLint fiveCellModelMatLoc;
+	GLint rotationZWLoc;
+	GLint rotationXWLoc;
+	GLint lightPosLoc;
+	GLint light2PosLoc;
+	GLint alphaLoc;	
+	GLint cameraPosLoc;
 
-	//glm::mat4 rotationZW;
-	//glm::mat4 rotationXW; 
+	glm::mat4 rotationZW;
+	glm::mat4 rotationXW; 
 	
 	//matrices 
 	glm::mat4 modelMatrix;
-	//glm::mat4 scale5CellMatrix;
-	//glm::mat4 fiveCellModelMatrix;
+	glm::mat4 scale5CellMatrix;
+	glm::mat4 fiveCellModelMatrix;
 	//glm::mat4 groundModelMatrix;
 	//glm::mat4 quadModelMatrix;
 	glm::mat4 skyboxModelMatrix;
 
 	//lights
-	//glm::vec3 lightPos;
-	//glm::vec3 light2Pos;
+	glm::vec3 lightPos;
+	glm::vec3 light2Pos;
 
 	//SoundObjects
-	//SoundObject soundObjects [5];
+	SoundObject soundObjects [5];
 
 	//Skybox
 	//Skybox skybox;

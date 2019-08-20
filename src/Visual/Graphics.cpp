@@ -811,7 +811,7 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 
 	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
 	glm::mat4 currentProjMatrix = vrm->GetCurrentProjectionMatrix(nEye);
 	glm::mat4 currentViewMatrix = vrm->GetCurrentViewMatrix(nEye);
@@ -836,7 +836,7 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 	//glBindVertexArray(0);
 
 	//update variables for fiveCell
-	//fiveCell.update(currentProjMatrix, currentViewMatrix);
+	fiveCell.update(currentProjMatrix, currentViewMatrix, viewEyeMatrix);
 
 	//draw fiveCell scene
 	fiveCell.draw(skyboxShaderProg, groundPlaneShaderProg, soundObjShaderProg, fiveCellShaderProg, quadShaderProg, currentProjMatrix, viewEyeMatrix, currentViewMatrix, currentEyeMatrix);
