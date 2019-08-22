@@ -158,14 +158,25 @@ aR = (aRightSigs[0] + aRightSigs[1] + aRightSigs[2] + aRightSigs[3] + aRightSigs
 outs	aL,	aR
 endin
 
+instr 3 ;test tone
+
+kamp = ampdbfs(-3) 
+kcps = 440
+
+asig 	oscil 	kamp, 	kcps 	
+	outs 	asig, 	asig
+
+endin
 
 </CsInstruments>
 <CsScore>
 ;p1	p2	p3	p4	p5	p6	p7	p8	p9	p10	p11	p12	p13	p14	p15	p16	p17	p18	p19	p20	p21	p22	p23	p24
 
-i1 	0 	90 	-3	50	70	82	80	90	1000  	720  	850	700	820	440	882  	660	220	442	500	400	350	130	200
+i1 	0 	90 	-6	50	70	82	80	90	1000  	720  	850	700	820	440	882  	660	220	442	500	400	350	130	200
 
 i2	0	90
+
+;i3	0	240
 
 </CsScore>
 </CsoundSynthesizer>

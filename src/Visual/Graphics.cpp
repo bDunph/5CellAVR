@@ -156,8 +156,8 @@ bool Graphics::BInitGL(std::unique_ptr<VR_Manager>& vrm, bool fullscreen){
 		std::cout << "quadShaderProg returned NULL: Graphics::BInitGL" << std::endl;
 		return false;
 	}
-
-	if(!fiveCell.setup("mode5cell.csd", skyboxShaderProg, soundObjShaderProg, groundPlaneShaderProg, fiveCellShaderProg, quadShaderProg)) {
+	std::string csdFileName = "mode5cell.csd";
+	if(!fiveCell.setup(csdFileName, skyboxShaderProg, soundObjShaderProg, groundPlaneShaderProg, fiveCellShaderProg, quadShaderProg)) {
 		std::cout << "fiveCell setup failed: Graphics BInitGL" << std::endl;
 		return false;
 	}

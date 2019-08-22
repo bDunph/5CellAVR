@@ -3,7 +3,7 @@
 
 //#include "Skybox.hpp"
 #include "SoundObject.hpp"
-//#include "CsoundSession.hpp"
+#include "CsoundSession.hpp"
 
 #include <string>
 
@@ -39,7 +39,7 @@ private:
 	//bool needDraw;
 	//float radius;
 
-	//MYFLT* hrtfVals[15];
+	MYFLT* hrtfVals[15];
 
 	//ground plane
 	//GLuint groundVAO;
@@ -53,7 +53,7 @@ private:
 	//GLint ground_cameraPosLoc;
 	
 	//fivecell 
-	glm::vec4 vertArray[5];
+	glm::vec4 vertArray5Cell[5];
 	GLuint vao;
 	GLuint index;
 	GLuint lineIndex;
@@ -112,6 +112,6 @@ private:
 	//GLint quad_cameraPosLoc;
 
 	//Csound
-	//CsoundSession *session;
+	CsoundSession *session;
 };
 #endif

@@ -26,29 +26,29 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 //************************************************************
 //Csound performance thread
 //************************************************************
-	//std::string csdName = "";
-	//if(!csd.empty()) csdName = csd;
-	//session = new CsoundSession(csdName);
-	//for(int i = 0; i < 5; i++){
-	//	std::string val1 = "azimuth" + std::to_string(i);
-	//	const char* azimuth = val1.c_str();	
-	//	if(session->GetChannelPtr(hrtfVals[3 * i], azimuth, CSOUND_INPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
-	//		std::cout << "GetChannelPtr could not get the azimuth input" << std::endl;
-	//		return false;
-	//	}
-	//	std::string val2 = "elevation" + std::to_string(i);
-	//	const char* elevation = val2 .c_str();
-	//	if(session->GetChannelPtr(hrtfVals[(3 * i) + 1], elevation, CSOUND_INPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
-	//		std::cout << "GetChannelPtr could not get the elevation input" << std::endl;
-	//		return false;
-	//	}	
-	//	std::string val3 = "distance" + std::to_string(i);
-	//	const char* distance = val3.c_str();
-	//	if(session->GetChannelPtr(hrtfVals[(3 * i) + 2], distance, CSOUND_INPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
-	//		std::cout << "GetChannelPtr could not get the distance input" << std::endl;
-	//		return false;
-	//	}
-	//}
+	std::string csdName = "";
+	if(!csd.empty()) csdName = csd;
+	session = new CsoundSession(csdName);
+	for(int i = 0; i < 5; i++){
+		std::string val1 = "azimuth" + std::to_string(i);
+		const char* azimuth = val1.c_str();	
+		if(session->GetChannelPtr(hrtfVals[3 * i], azimuth, CSOUND_INPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
+			std::cout << "GetChannelPtr could not get the azimuth input" << std::endl;
+			return false;
+		}
+		std::string val2 = "elevation" + std::to_string(i);
+		const char* elevation = val2 .c_str();
+		if(session->GetChannelPtr(hrtfVals[(3 * i) + 1], elevation, CSOUND_INPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
+			std::cout << "GetChannelPtr could not get the elevation input" << std::endl;
+			return false;
+		}	
+		std::string val3 = "distance" + std::to_string(i);
+		const char* distance = val3.c_str();
+		if(session->GetChannelPtr(hrtfVals[(3 * i) + 2], distance, CSOUND_INPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
+			std::cout << "GetChannelPtr could not get the distance input" << std::endl;
+			return false;
+		}
+	}
 //************************************************************
 
 	//glEnable(GL_DEPTH_TEST);
@@ -504,7 +504,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 		1.0f/sqrt(10.0f), -sqrt(3.0f/2.0f), 0.0f, 0.0f,
 		-2.0f * sqrt(2.0f/5.0f), 0.0f, 0.0f, 0.0f
 	};*/
-	float vertices [20] = {
+	float vertices5Cell [20] = {
 		0.3162f, 0.4082f, 0.5774f, 1.0f,
 		0.3162f, 0.4082f, 0.5774f, -1.0f,
 		0.3162f, 0.4082f, -1.1547, 0.0f,
@@ -555,14 +555,16 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 
 	//array of verts
 	glm::vec4 vertArray [5] = {
-		glm::vec4(vertices[0], vertices[1], vertices[2], vertices[3]),
-		glm::vec4(vertices[4], vertices[5], vertices[6], vertices[7]),
-		glm::vec4(vertices[8], vertices[9], vertices[10], vertices[11]),
-		glm::vec4(vertices[12], vertices[13], vertices[14], vertices[15]),
-		glm::vec4(vertices[16], vertices[17], vertices[18], vertices[19])
+		glm::vec4(vertices5Cell[0], vertices5Cell[1], vertices5Cell[2], vertices5Cell[3]),
+		glm::vec4(vertices5Cell[4], vertices5Cell[5], vertices5Cell[6], vertices5Cell[7]),
+		glm::vec4(vertices5Cell[8], vertices5Cell[9], vertices5Cell[10], vertices5Cell[11]),
+		glm::vec4(vertices5Cell[12], vertices5Cell[13], vertices5Cell[14], vertices5Cell[15]),
+		glm::vec4(vertices5Cell[16], vertices5Cell[17], vertices5Cell[18], vertices5Cell[19])
 	};
 
-	
+	for(int i = 0; i < _countof(vertArray); i++){
+		vertArray5Cell[i] = vertArray [i];
+	}	
 
 	//array of faces
 	glm::vec3 faceArray [10] = {
@@ -680,7 +682,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, 20 * sizeof(float), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 20 * sizeof(float), vertices5Cell, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
@@ -733,7 +735,11 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 
 	//radius = 0.75f;
 	
+	
+
 	return true;
+
+
 }
 
 void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::mat4 viewEyeMat){
@@ -741,92 +747,96 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::mat4 viewEyeMat
 //***********************************************************************************************************
 // Update Stuff Here
 //*********************************************************************************************************
-		currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		
-		//_update_fps_counter(window);
-		
-		//glClearColor(0.87, 0.85, 0.75, 0.95);
-		//wipe the drawing surface clear
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//update camera position in headspace
-		cameraPos = glm::vec3(viewMat[3][0], viewMat[3][1], viewMat[3][2]);
+	//for(int i = 0; i < 5; i++){
+	//	std::cout << std::to_string(i) << " --- " << std::to_string(vertArray5Cell[i].x) << " : " << std::to_string(vertArray5Cell[i].y) << " : " << std::to_string(vertArray5Cell[i].z) << " : " << std::to_string(vertArray5Cell[i].w) << std::endl;
+	//}
+		
 
-		//float rotVal = glm::radians(45.0f);
-		//rotation around W axis
-		rotationZW = glm::mat4(
-			1.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, cos(glfwGetTime() * 0.2f), -sin(glfwGetTime() * 0.2f),
-			0.0f, 0.0f, sin(glfwGetTime() * 0.2f), cos(glfwGetTime() * 0.2f)
-		);
+	currentFrame = glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
 	
-		rotationXW = glm::mat4(	
-			cos(glfwGetTime() * 0.2f), 0.0f, 0.0f, sin(glfwGetTime() * 0.2f),
-			0.0f, 1.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 0.0f, 
-			-sin(glfwGetTime() * 0.2f), 0.0f, 0.0f, cos(glfwGetTime() * 0.2f) 
-		);
+	//_update_fps_counter(window);
+		
+	//glClearColor(0.87, 0.85, 0.75, 0.95);
+	//wipe the drawing surface clear
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//coords of verts to use for hrtf calculations 
-		glm::vec3 projectedVerts [5];
-		float projectionDistance = 2.0f;
-		//for(int i = 0; i < _countof(vertArray); i++){
-//HEEEEEEEEEEEEEEERRRRRRRRRRRRRRRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE?????????????????????
-		for(int i = 0; i < 5; i++){
-		std::cout << std::to_string(vertArray[i].x) << " : " << std::to_string(vertArray[i].y) << " : " << std::to_string(vertArray[i].z) << " : " << std::to_string(vertArray[i].w) << std::endl;
-		}
+	//update camera position in headspace
+	cameraPos = glm::vec3(viewMat[3][0], viewMat[3][1], viewMat[3][2]);
 
-		for(int i = 0; i < 5; i++){
-			//glm::vec4 rotatedVert = rotationZW * vertArray[i];
+	//float rotVal = glm::radians(45.0f);
+	//rotation around W axis
+	rotationZW = glm::mat4(
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, cos(glfwGetTime() * 0.2f), -sin(glfwGetTime() * 0.2f),
+		0.0f, 0.0f, sin(glfwGetTime() * 0.2f), cos(glfwGetTime() * 0.2f)
+	);
 
-			glm::vec4 rotatedVert = vertArray[i];
-			
-			//std::cout << std::to_string(vertArray[i].x) << " : " << std::to_string(vertArray[i].y) << " : " << std::to_string(vertArray[i].z) << " : " << std::to_string(vertArray[i].w) << std::endl;
+	rotationXW = glm::mat4(	
+		cos(glfwGetTime() * 0.2f), 0.0f, 0.0f, sin(glfwGetTime() * 0.2f),
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f, 
+		-sin(glfwGetTime() * 0.2f), 0.0f, 0.0f, cos(glfwGetTime() * 0.2f) 
+	);
 
-			float projectedPointX = (rotatedVert.x * projectionDistance) / (projectionDistance - rotatedVert.w); 	
-			float projectedPointY = (rotatedVert.y * projectionDistance) / (projectionDistance - rotatedVert.w); 	
-			float projectedPointZ = (rotatedVert.z * projectionDistance) / (projectionDistance - rotatedVert.w); 	
+	//coords of verts to use for hrtf calculations 
+	glm::vec3 projectedVerts [5];
+	float projectionDistance = 2.0f;
+	//for(int i = 0; i < _countof(vertArray); i++){
+
+		
+
+	for(int i = 0; i < 5; i++){
+		glm::vec4 rotatedVert = rotationZW * rotationXW * vertArray5Cell[i];
+
+		//std::cout << std::to_string(vertArray[i].x) << " : " << std::to_string(vertArray[i].y) << " : " << std::to_string(vertArray[i].z) << " : " << std::to_string(vertArray[i].w) << std::endl;
+
+		float projectedPointX = (rotatedVert.x * projectionDistance) / (projectionDistance - rotatedVert.w); 	
+		float projectedPointY = (rotatedVert.y * projectionDistance) / (projectionDistance - rotatedVert.w); 	
+		float projectedPointZ = (rotatedVert.z * projectionDistance) / (projectionDistance - rotatedVert.w); 	
  	
-			projectedVerts[i] = glm::vec3(projectedPointX, projectedPointY, projectedPointZ);
+		projectedVerts[i] = glm::vec3(projectedPointX, projectedPointY, projectedPointZ);
 			
-			glm::vec4 posView = projMat * viewMat * fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0);
+		glm::vec4 posView = projMat * viewMat * fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0);
 
-			//calculate azimuth and elevation values for hrtf
+		//calculate azimuth and elevation values for hrtf
 		
-			glm::vec3 viewerPos = cameraPos;
-			glm::vec3 soundPos = glm::vec3(posView); 
+		glm::vec3 viewerPos = cameraPos;
+		glm::vec3 soundPos = glm::vec3(posView); 
 	
-			//distance
-			float r = sqrt((pow((soundPos.x - viewerPos.x), 2)) + (pow((soundPos.y - viewerPos.y), 2)) + (pow((soundPos.z - viewerPos.z), 2)));
-			//std::cout << r << std::endl;	
+		//distance
+		float r = sqrt((pow((soundPos.x - viewerPos.x), 2)) + (pow((soundPos.y - viewerPos.y), 2)) + (pow((soundPos.z - viewerPos.z), 2)));
+		//std::cout << r << std::endl;	
 	
-			//azimuth
-			float valX = soundPos.x - viewerPos.x;
-			float valZ = soundPos.z - viewerPos.z;
-			float azimuth = atan2(valX, valZ);
-			azimuth *= (180.0f/PI); 	
-			//std::cout << azimuth << std::endl;
+		//azimuth
+		float valX = soundPos.x - viewerPos.x;
+		float valZ = soundPos.z - viewerPos.z;
+		float azimuth = atan2(valX, valZ);
+		azimuth *= (180.0f/PI); 	
+		//std::cout << azimuth << std::endl;
 	
-			//elevation
-			float cosVal = (soundPos.y - viewerPos.y) / r;
-			float elevation = asin(cosVal);
-			elevation *= (180.0f/PI);		
-			//std::cout << elevation<< std::endl;
+		//elevation
+		float cosVal = (soundPos.y - viewerPos.y) / r;
+		float elevation = asin(cosVal);
+		elevation *= (180.0f/PI);		
+		//std::cout << elevation<< std::endl;
 
-			//*hrtfVals[3 * i] = (MYFLT)azimuth;
-			//*hrtfVals[(3 * i) + 1] = (MYFLT)elevation;
-			//*hrtfVals[(3 * i) + 2] = (MYFLT)r;
+		*hrtfVals[3 * i] = (MYFLT)azimuth;
+		*hrtfVals[(3 * i) + 1] = (MYFLT)elevation;
+		*hrtfVals[(3 * i) + 2] = (MYFLT)r;
+
+		//std::cout << std::to_string(i) << " --- " << std::to_string(*hrtfVals[3 * i]) << " : " << std::to_string(*hrtfVals[(3 * i) + 1]) << " : " << std::to_string(*hrtfVals[(3 * i) + 2]) << std::endl;
 			
-			//update sound object position
-			soundObjects[i].update(projectedVerts[i]);	
-			//std::cout << std::to_string(projectedVerts[i].x) << " : " << std::to_string(projectedVerts[i].y) << " : " << std::to_string(projectedVerts[i].z) << std::endl;
-		}
+		//update sound object position
+		soundObjects[i].update(projectedVerts[i]);	
+		//std::cout << std::to_string(projectedVerts[i].x) << " : " << std::to_string(projectedVerts[i].y) << " : " << std::to_string(projectedVerts[i].z) << std::endl;
+	}
 
-		//float rotAngle = glfwGetTime() * 0.2f;
-		//glm::mat4 fiveCellRotationMatrix3D = glm::rotate(modelMatrix, rotAngle, glm::vec3(0, 1, 0)) ;
-		//fiveCellModelMatrix = scale5CellMatrix;
+	//float rotAngle = glfwGetTime() * 0.2f;
+	//glm::mat4 fiveCellRotationMatrix3D = glm::rotate(modelMatrix, rotAngle, glm::vec3(0, 1, 0)) ;
+	//fiveCellModelMatrix = scale5CellMatrix;
 		
 }
 
@@ -836,172 +846,172 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 // Draw Stuff Here
 //*********************************************************************************************************
 
-		camPosPerEye = glm::vec3(viewEyeMat[3][0], viewEyeMat[3][1], viewEyeMat[3][2]);
+	camPosPerEye = glm::vec3(viewEyeMat[3][0], viewEyeMat[3][1], viewEyeMat[3][2]);
 
-		//draw 4D polytope	
-		//float a = 0.0f;
+	//draw 4D polytope	
+	//float a = 0.0f;
 
-		//glBindVertexArray(vao);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
-		//glUseProgram(fiveCellProg);
+	//glBindVertexArray(vao);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
+	//glUseProgram(fiveCellProg);
 
-		//glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, &projMat[0][0]);
-		//glUniformMatrix4fv(viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
-		//glUniformMatrix4fv(fiveCellModelMatLoc, 1, GL_FALSE, &fiveCellModelMatrix[0][0]);
-      		//glUniformMatrix4fv(rotationZWLoc, 1, GL_FALSE, &rotationZW[0][0]);
-		//glUniformMatrix4fv(rotationXWLoc, 1, GL_FALSE, &rotationXW[0][0]);
-		//glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-		//glUniform3f(light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
-		//glUniform3f(cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
-		//glUniform1f(alphaLoc, a);
+	//glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+	//glUniformMatrix4fv(viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
+	//glUniformMatrix4fv(fiveCellModelMatLoc, 1, GL_FALSE, &fiveCellModelMatrix[0][0]);
+      	//glUniformMatrix4fv(rotationZWLoc, 1, GL_FALSE, &rotationZW[0][0]);
+	//glUniformMatrix4fv(rotationXWLoc, 1, GL_FALSE, &rotationXW[0][0]);
+	//glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+	//glUniform3f(light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
+	//glUniform3f(cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
+	//glUniform1f(alphaLoc, a);
 
-		////single draw call for refractive rendering
-		////glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-      		////glDrawElements(GL_LINES, 20 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+	////single draw call for refractive rendering
+	////glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+      	////glDrawElements(GL_LINES, 20 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
 
-      		////draw 5-cell using index buffer and 5 pass transparency technique from http://www.alecjacobson.com/weblog/?p=2750
-		////1st pass
-		//glDisable(GL_CULL_FACE);
-		//glDepthFunc(GL_LESS);
-		//float f = 0.75f;
-		//float origAlpha = 0.4f;	
-		//a = 0.0f;
-		//glUniform1f(alphaLoc, a);
-		//glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+      	////draw 5-cell using index buffer and 5 pass transparency technique from http://www.alecjacobson.com/weblog/?p=2750
+	////1st pass
+	//glDisable(GL_CULL_FACE);
+	//glDepthFunc(GL_LESS);
+	//float f = 0.75f;
+	//float origAlpha = 0.4f;	
+	//a = 0.0f;
+	//glUniform1f(alphaLoc, a);
+	//glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
 
-		////2nd pass
-		//glEnable(GL_CULL_FACE);
-		//glCullFace(GL_FRONT);
-		//glDepthFunc(GL_ALWAYS);
-		//a = origAlpha * f;
-		//glUniform1f(alphaLoc, a);
-		//glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-		//
-		////3rd pass
-		//glDepthFunc(GL_LEQUAL);
-		//a = (origAlpha - (origAlpha * f)) / (1.0f - (origAlpha * f));
-		//glUniform1f(alphaLoc, a);
-		//glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-
-		////4th pass
-		//glCullFace(GL_BACK);
-		//glDepthFunc(GL_ALWAYS);
-		//a = origAlpha * f;
-		//glUniform1f(alphaLoc, a);
-		//glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-
-		////5th pass
-		//glDisable(GL_CULL_FACE);
-		//glDepthFunc(GL_LEQUAL);
-		//a = (origAlpha - (origAlpha * f)) / (1.0f - (origAlpha * f));
-		//glUniform1f(alphaLoc, a);
-		//glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//glBindVertexArray(0);
-
-		// draw ground plane second 
-		//glDepthFunc(GL_LESS);
-
-		//glBindVertexArray(groundVAO);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, groundIndexBuffer); 
-		//glUseProgram(groundPlaneProg);
-
-		//glUniformMatrix4fv(ground_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
-		//glUniformMatrix4fv(ground_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
-		//glUniformMatrix4fv(ground_modelMatLoc, 1, GL_FALSE, &groundModelMatrix[0][0]);
-		//glUniform3f(ground_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-		//glUniform3f(ground_light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
-		//glUniform3f(ground_cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
-
-		//glDrawElements(GL_TRIANGLES, 6 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//glBindVertexArray(0);
+	////2nd pass
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT);
+	//glDepthFunc(GL_ALWAYS);
+	//a = origAlpha * f;
+	//glUniform1f(alphaLoc, a);
+	//glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+	//
+	////3rd pass
+	//glDepthFunc(GL_LEQUAL);
+	//a = (origAlpha - (origAlpha * f)) / (1.0f - (origAlpha * f));
+	//glUniform1f(alphaLoc, a);
+	//glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
 	
-		//draw texture quad
-		//glBindVertexArray(quadVAO);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIndexBuffer); 
-		//glBindTexture(GL_TEXTURE_2D, quadTexID); 
-		//glUseProgram(quadShaderProg);
+	////4th pass
+	//glCullFace(GL_BACK);
+	//glDepthFunc(GL_ALWAYS);
+	//a = origAlpha * f;
+	//glUniform1f(alphaLoc, a);
+	//glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
 
-		//glUniformMatrix4fv(quad_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
-		//glUniformMatrix4fv(quad_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
-		//glUniformMatrix4fv(quad_modelMatLoc, 1, GL_FALSE, &quadModelMatrix[0][0]);
-		////glUniform3f(quad_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-		////glUniform3f(quad_light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
-		////glUniform3f(quad_cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
+	////5th pass
+	//glDisable(GL_CULL_FACE);
+	//glDepthFunc(GL_LEQUAL);
+	//a = (origAlpha - (origAlpha * f)) / (1.0f - (origAlpha * f));
+	//glUniform1f(alphaLoc, a);
+	//glDrawElements(GL_TRIANGLES, 30 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
 
-		//glDrawElements(GL_TRIANGLES, 36 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//glBindVertexArray(0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
 
-		glDisable(GL_CULL_FACE);
-		//draw skybox
-		//skybox.draw(projMat, viewEyeMat, skyboxProg);
-		glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(viewEyeMat));
-		glm::mat4 viewNTEyeMat = eyeMat * viewNoTranslation; 
-		
-		//glm::mat4 viewNTEyeMat = glm::mat4(
-		//		viewEyeMat[0][0], viewEyeMat[1][0], viewEyeMat[2][0], 0.0f,
-		//		viewEyeMat[0][1], viewEyeMat[1][1], viewEyeMat[2][1], 0.0f,
-		//		viewEyeMat[0][2], viewEyeMat[1][2], viewEyeMat[2][2], 0.0f,
-		//		0.0f, 0.0f, 0.0f, 1.0f
-		//		);
+	// draw ground plane second 
+	//glDepthFunc(GL_LESS);
 
-		glDepthFunc(GL_LEQUAL);
-		glDepthMask(GL_FALSE);
-		
-		glBindVertexArray(skyboxVAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndexBuffer); 
-		//glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexID);
-		glUseProgram(skyboxProg);
-		
-		//glUniform1i(skybox_texUniformLoc, 0);
-		glUniformMatrix4fv(skybox_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
-		glUniformMatrix4fv(skybox_viewMatLoc, 1, GL_FALSE, &viewNoTranslation[0][0]);
-		glUniformMatrix4fv(skybox_modelMatLoc, 1, GL_FALSE, &skyboxModelMatrix[0][0]);
-		
-		glDrawElements(GL_TRIANGLES, 36 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+	//glBindVertexArray(groundVAO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, groundIndexBuffer); 
+	//glUseProgram(groundPlaneProg);
 
-		///glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
+	//glUniformMatrix4fv(ground_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+	//glUniformMatrix4fv(ground_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
+	//glUniformMatrix4fv(ground_modelMatLoc, 1, GL_FALSE, &groundModelMatrix[0][0]);
+	//glUniform3f(ground_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+	//glUniform3f(ground_light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
+	//glUniform3f(ground_cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
+
+	//glDrawElements(GL_TRIANGLES, 6 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
 	
-		glDepthMask(GL_TRUE);
-		glDepthFunc(GL_LESS);
+	//draw texture quad
+	//glBindVertexArray(quadVAO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIndexBuffer); 
+	//glBindTexture(GL_TEXTURE_2D, quadTexID); 
+	//glUseProgram(quadShaderProg);
 
-		//draw sound test objects
-		//for(int i = 0; i < _countof(soundObjects); i++){
+	//glUniformMatrix4fv(quad_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+	//glUniformMatrix4fv(quad_viewMatLoc, 1, GL_FALSE, &viewEyeMat[0][0]);
+	//glUniformMatrix4fv(quad_modelMatLoc, 1, GL_FALSE, &quadModelMatrix[0][0]);
+	////glUniform3f(quad_lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+	////glUniform3f(quad_light2PosLoc, light2Pos.x, light2Pos.y, light2Pos.z);
+	////glUniform3f(quad_cameraPosLoc, camPosPerEye.x, camPosPerEye.y, camPosPerEye.z);
 
-		for(int i = 0; i < 5; i++){
-			soundObjects[i].draw(projMat, viewEyeMat, lightPos, light2Pos, camPosPerEye, soundObjProg);
-		}	
+	//glDrawElements(GL_TRIANGLES, 36 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
+
+	glDisable(GL_CULL_FACE);
+	//draw skybox
+	//skybox.draw(projMat, viewEyeMat, skyboxProg);
+	glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(viewEyeMat));
+	glm::mat4 viewNTEyeMat = eyeMat * viewNoTranslation; 
 		
-		//update other events like input handling
-		//glfwPollEvents();
+	//glm::mat4 viewNTEyeMat = glm::mat4(
+	//		viewEyeMat[0][0], viewEyeMat[1][0], viewEyeMat[2][0], 0.0f,
+	//		viewEyeMat[0][1], viewEyeMat[1][1], viewEyeMat[2][1], 0.0f,
+	//		viewEyeMat[0][2], viewEyeMat[1][2], viewEyeMat[2][2], 0.0f,
+	//		0.0f, 0.0f, 0.0f, 1.0f
+	//		);
 
-		// workaround for macOS Mojave bug
-		//if(needDraw){
-		//	glfwShowWindow(window);
-		//	glfwHideWindow(window);
-		//	glfwShowWindow(window);
-		//	needDraw = false;
-		//}
-
-		//put the stuff we've been drawing onto the display
-		//glfwSwapBuffers(window);
-
-		//glfwSetCursorPosCallback(window, mouse_callback);
-		//glfwSetWindowSizeCallback(window, glfw_window_size_callback);
-		//glfwSetErrorCallback(glfw_error_callback);
+	glDepthFunc(GL_LEQUAL);
+	glDepthMask(GL_FALSE);
 		
-		lastFrame = currentFrame;
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndexBuffer); 
+	//glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexID);
+	glUseProgram(skyboxProg);
+		
+	//glUniform1i(skybox_texUniformLoc, 0);
+	glUniformMatrix4fv(skybox_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
+	glUniformMatrix4fv(skybox_viewMatLoc, 1, GL_FALSE, &viewNoTranslation[0][0]);
+	glUniformMatrix4fv(skybox_modelMatLoc, 1, GL_FALSE, &skyboxModelMatrix[0][0]);
+		
+	glDrawElements(GL_TRIANGLES, 36 * sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+
+	///glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
+
+	//draw sound test objects
+	//for(int i = 0; i < _countof(soundObjects); i++){
+
+	for(int i = 0; i < 5; i++){
+		soundObjects[i].draw(projMat, viewEyeMat, lightPos, light2Pos, camPosPerEye, soundObjProg);
+	}	
+		
+	//update other events like input handling
+	//glfwPollEvents();
+
+	// workaround for macOS Mojave bug
+	//if(needDraw){
+	//	glfwShowWindow(window);
+	//	glfwHideWindow(window);
+	//	glfwShowWindow(window);
+	//	needDraw = false;
+	//}
+
+	//put the stuff we've been drawing onto the display
+	//glfwSwapBuffers(window);
+
+	//glfwSetCursorPosCallback(window, mouse_callback);
+	//glfwSetWindowSizeCallback(window, glfw_window_size_callback);
+	//glfwSetErrorCallback(glfw_error_callback);
+		
+	lastFrame = currentFrame;
 }
 
 void FiveCell::exit(){
 	//stop csound
-	//session->StopPerformance();
+	session->StopPerformance();
 	//close GL context and any other GL resources
 	glfwTerminate();
 }
