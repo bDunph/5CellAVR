@@ -13,6 +13,8 @@ find_package(OpenGL 4.1 REQUIRED)
 
 if(APPLE)
 
+	#SET (CMAKE_C_COMPILER	"/usr/bin/clang")
+
 	find_package(glfw3 REQUIRED)
 	find_package(GLEW REQUIRED) 
 
