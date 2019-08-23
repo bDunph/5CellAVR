@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdarg>
 #include <string>
+#include <iostream>
 
 #ifdef __APPLE__
 #include <GLFW/glfw3.h>
@@ -43,12 +44,24 @@ void dprintf(const char *fmt, ... )
 	char buffer[ 2048 ];
 
 	va_start( args, fmt );
+
+#ifdef __APPLE__
+	vsprintf(buffer, fmt, args);
+#elif _WIN32
 	vsprintf_s( buffer, fmt, args );
+#endif
+
 	va_end( args );
 
 	printf( "%s", buffer );
 
+#ifdef __APPLE__
+	std::string charString = buffer;
+	std::cout << "Debug Message from dprintf() (SystemInfo.cpp): " << charString << std::endl; 
+#elif _WIN32
 	OutputDebugStringA( buffer );
+#endif
+
 }
 
 //-----------------------------------------------------------------------------

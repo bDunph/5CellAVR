@@ -2,22 +2,11 @@
 #define FIVE_CELL_HPP
 
 //#include "Skybox.hpp"
-#include "SoundObject.hpp"
-#include "CsoundSession.hpp"
 
 #include <string>
 
-#ifdef __APPLE__ 
-#include <GL/glew.h>
-#include "GLFW/glfw3.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#elif _WIN32 
-#include "GL/glew.h"
-#include "glfw3.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#endif
+#include "SoundObject.hpp"
+#include "CsoundSession.hpp"
 
 class FiveCell {
 

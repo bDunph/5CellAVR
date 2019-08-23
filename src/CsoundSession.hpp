@@ -3,7 +3,12 @@
 
 #include <string>
 
+#ifdef __APPLE__
+#include <csound.hpp>
+#elif _WIN32
 #include "csound/csound.hpp"
+#endif
+
 #include "csPerfThread.hpp"
 
 class CsoundSession : public Csound{

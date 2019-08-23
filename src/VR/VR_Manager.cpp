@@ -2,11 +2,18 @@
 #include <cstring>
 
 #include "VR_Manager.hpp"
-#include "pathtools.h"
 
-#ifdef __APPLE__
+#include <GL/glew.h>
+
+#ifdef __APPLE__ 
+#include "GLFW/glfw3.h"
+
 #define _stricmp strcasecmp
 #include <strings.h>
+
+#elif _WIN32 
+#include "glfw3.h"
+#include "pathtools.h"
 #endif
 
 //-----------------------------------------
@@ -55,7 +62,13 @@ bool VR_Manager::BInit(){
 		return false;
 	}
 
+//*********** removing pathtools from osx build *************//
+#ifdef __APPLE__
+	std::string manifestPath = "/Users/bryandunphy/Projects/5CellAVR/src/VR/avr_actions.json";
+	vr::VRInput()->SetActionManifestPath(manifestPath.c_str()); 
+#elif _WIN32
 	vr::VRInput()->SetActionManifestPath( Path_MakeAbsolute( "../../src/VR/avr_actions.json", Path_StripFilename( Path_GetExecutablePath() ) ).c_str() );
+#endif
 	
 	vr::VRInput()->GetActionHandle( "/actions/avr/in/RotateStructure", &m_actionRotateStructure);
 	vr::VRInput()->GetActionHandle( "/actions/avr/in/HideThisController", &m_actionHideThisController);
@@ -184,6 +197,17 @@ bool VR_Manager::HandleInput()
 	for (EHand eHand = Left; eHand <= Right; ((int&)eHand)++)
 	{
 		vr::InputPoseActionData_t poseData;
+
+#ifdef __APPLE__
+		if ( vr::VRInput()->GetPoseActionDataRelativeToNow( m_rHand[eHand].m_actionPose, vr::TrackingUniverseStanding, 0, &poseData, sizeof( poseData ), vr::k_ulInvalidInputValueHandle ) != vr::VRInputError_None
+			|| !poseData.bActive || !poseData.pose.bPoseIsValid )
+		{
+			m_rHand[eHand].m_bShowController = false;
+		}
+		else
+		{
+			m_rHand[eHand].m_rmat4Pose = ConvertSteamVRMatrixToGlmMat4( poseData.pose.mDeviceToAbsoluteTracking );
+#elif _WIN32
 		if ( vr::VRInput()->GetPoseActionData( m_rHand[eHand].m_actionPose, vr::TrackingUniverseStanding, 0, &poseData, sizeof( poseData ), vr::k_ulInvalidInputValueHandle ) != vr::VRInputError_None
 			|| !poseData.bActive || !poseData.pose.bPoseIsValid )
 		{
@@ -192,6 +216,7 @@ bool VR_Manager::HandleInput()
 		else
 		{
 			m_rHand[eHand].m_rmat4Pose = ConvertSteamVRMatrixToGlmMat4( poseData.pose.mDeviceToAbsoluteTracking );
+#endif
 
 			vr::InputOriginInfo_t originInfo;
 			if ( vr::VRInput()->GetOriginTrackedDeviceInfo( poseData.activeOrigin, &originInfo, sizeof( originInfo ) ) == vr::VRInputError_None 

@@ -1,6 +1,8 @@
 #include "VR_Helper.hpp"
 
+#ifdef _WIN32
 #include <windows.h>
+#endif
 
 //-----------------------------------------------------------------------
 std::string VR_Helper::GetTrackedDeviceString(vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError){

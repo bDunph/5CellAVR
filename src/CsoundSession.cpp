@@ -1,6 +1,7 @@
 #include "CsoundSession.hpp"
 #include <iostream>
 
+
 void CsoundSession::StartThread(){
 	if(Compile((char *)m_csd.c_str()) == 0){
 		m_pt = new CsoundPerformanceThread(this);	

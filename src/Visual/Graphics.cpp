@@ -1,6 +1,10 @@
 #include <iostream>
 #include <vector>
+
+#ifdef _WIN32 
 #include <windows.h>
+#endif
+
 #include <cmath>
 #include <stdlib.h>
 
@@ -742,7 +746,7 @@ void Graphics::RenderControllerAxes(std::unique_ptr<VR_Manager>& vrm)
 		glEnableVertexAttribArray( 0 );
 		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, stride, (const void *)offset);
 
-		offset += sizeof( Vector3 );
+		offset += sizeof( glm::vec3);
 		glEnableVertexAttribArray( 1 );
 		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, stride, (const void *)offset);
 

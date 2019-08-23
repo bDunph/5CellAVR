@@ -18,8 +18,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #endif
-//#if defined OSX 
-#if defined __APPLE__
+//#if defined( OSX )
+#if defined( __APPLE__ )
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <mach-o/dyld.h>
@@ -436,7 +436,8 @@ bool Path_IsDirectory( const std::string & sPath )
 
 	// see if the specified path actually exists.
 
-#if defined(POSIX)
+//#if defined(POSIX)
+#if defined( POSIX ) || defined(__APPLE__) 
 	struct	stat	buf;
 	if ( stat( sFixedPath.c_str(), &buf ) == -1 )
 	{
@@ -564,7 +565,8 @@ std::string Path_FindParentSubDirectoryRecursively( const std::string &strStartD
 unsigned char * Path_ReadBinaryFile( const std::string &strFilename, int *pSize )
 {
 	FILE *f;
-#if defined( POSIX )
+//#if defined( POSIX )
+#if defined( POSIX ) || defined(__APPLE__) 
 	f = fopen( strFilename.c_str(), "rb" );
 #else
 	std::wstring wstrFilename = UTF8to16( strFilename.c_str() );
@@ -601,7 +603,8 @@ unsigned char * Path_ReadBinaryFile( const std::string &strFilename, int *pSize 
 uint32_t  Path_ReadBinaryFile( const std::string &strFilename, unsigned char *pBuffer, uint32_t unSize )
 {
 	FILE *f;
-#if defined( POSIX )
+//#if defined( POSIX )
+#if defined( POSIX ) || defined(__APPLE__) 
 	f = fopen( strFilename.c_str(), "rb" );
 #else
 	std::wstring wstrFilename = UTF8to16( strFilename.c_str() );
@@ -641,7 +644,8 @@ uint32_t  Path_ReadBinaryFile( const std::string &strFilename, unsigned char *pB
 bool Path_WriteBinaryFile(const std::string &strFilename, unsigned char *pData, unsigned nSize)
 {
 	FILE *f;
-#if defined( POSIX )
+//#if defined( POSIX )
+#if defined( POSIX ) || defined(__APPLE__) 
 	f = fopen(strFilename.c_str(), "wb");
 #else
 	std::wstring wstrFilename = UTF8to16( strFilename.c_str() );
@@ -690,7 +694,8 @@ std::string Path_ReadTextFile( const std::string &strFilename )
 bool Path_WriteStringToTextFile( const std::string &strFilename, const char *pchData )
 {
 	FILE *f;
-#if defined( POSIX )
+//#if defined( POSIX )
+#if defined( POSIX ) || defined(__APPLE__) 
 	f = fopen( strFilename.c_str(), "w" );
 #else
 	std::wstring wstrFilename = UTF8to16( strFilename.c_str() );
@@ -729,7 +734,8 @@ bool Path_WriteStringToTextFileAtomic( const std::string &strFilename, const cha
 		if ( !Path_WriteStringToTextFile( strFilename, pchData ) )
 			return false;
 	}
-#elif defined( POSIX )
+//#elif defined( POSIX )
+#elif defined( POSIX ) || defined(__APPLE__) 
 	if ( rename( strTmpFilename.c_str(), strFilename.c_str() ) == -1 )
 		return false;
 #else

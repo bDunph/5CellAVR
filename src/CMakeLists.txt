@@ -13,8 +13,6 @@ find_package(OpenGL 4.1 REQUIRED)
 
 if(APPLE)
 
-	#SET (CMAKE_C_COMPILER	"/usr/bin/clang")
-
 	find_package(glfw3 REQUIRED)
 	find_package(GLEW REQUIRED) 
 
@@ -32,8 +30,6 @@ if(APPLE)
 	if(NOT OPENVR)
 		message(FATAL_ERROR "OpenVR not found")
 	endif()
-	
-	include_directories(${GLEW_INCLUDE_DIRS})
 
 elseif(WIN32)
 
@@ -86,33 +82,52 @@ configure_file(
 
 #add the binary tree to the search path for include files
 #so that we will find avrConfig.h
+if(WIN32)
 include_directories(
 		
 		"${PROJECT_BINARY_DIR}"
 		"${PROJECT_SOURCE_DIR}"
+		${OPENGL_INCLUDE_DIRS}
+		"${PROJECT_SOURCE_DIR}/../include"
 		"${PROJECT_SOURCE_DIR}/FiveCell"
 		"${PROJECT_SOURCE_DIR}/Visual"
 		"${PROJECT_SOURCE_DIR}/VR"
 		"${PROJECT_SOURCE_DIR}/AvrApp"
 		"${PROJECT_SOURCE_DIR}/ValveTools"
-		"${PROJECT_SOURCE_DIR}/../include"
 		#"${PROJECT_SOURCE_DIR}/Algorithms"
 		#"${PROJECT_SOURCE_DIR}/Audio"
-		${OPENGL_INCLUDE_DIRS}
 	)
+elseif(APPLE)
+include_directories(
+		"/usr/local/include/"
+		"/Library/Frameworks/CsoundLib64.framework/Headers/"
+		"${PROJECT_BINARY_DIR}"
+		"${PROJECT_SOURCE_DIR}"
+		${GLEW_INCLUDE_DIRS}
+		${OPENGL_INCLUDE_DIRS}
+		"${PROJECT_SOURCE_DIR}/../include"
+		"${PROJECT_SOURCE_DIR}/FiveCell"
+		"${PROJECT_SOURCE_DIR}/Visual"
+		"${PROJECT_SOURCE_DIR}/VR"
+		"${PROJECT_SOURCE_DIR}/AvrApp"
+		#"${PROJECT_SOURCE_DIR}/Algorithms"
+		#"${PROJECT_SOURCE_DIR}/Audio"
+	)
+endif()
 
-
-add_subdirectory(Visual)
 add_subdirectory(FiveCell)
+add_subdirectory(Visual)
 add_subdirectory(VR)
 add_subdirectory(AvrApp)
+if(WIN32)
 add_subdirectory(ValveTools)
+endif()
 #add_subdirectory(Audio)
 #add_subdirectory(Algorithms)
 
 if(APPLE)
 	add_executable(avr main.cpp CsoundSession.cpp CsoundSession.hpp lodepng.cpp lodepng.h)
-	target_link_libraries(avr AvrApp VR ${OPENVR} ValveTools Visual FiveCell ${GLEW_LIBRARIES} glfw ${OPENGL_gl_LIBRARY} ${CSOUND_API} ${CSOUND_PERF_THREAD})
+	target_link_libraries(avr AvrApp VR ${OPENVR} Visual FiveCell glfw ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} ${CSOUND_API} ${CSOUND_PERF_THREAD})
 elseif(WIN32)
 	add_executable(avr main.cpp CsoundSession.cpp CsoundSession.hpp csPerfThread.cpp csPerfThread.hpp lodepng.cpp lodepng.h)
 	target_link_libraries(avr AvrApp VR OpenVR_target ValveTools Visual FiveCell Glew_target ${GLFW_WIN} ${OPENGL_gl_LIBRARY} Csound_target Libsndfile_target)

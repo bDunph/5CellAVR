@@ -10,6 +10,18 @@
 #include <iostream>
 #include "stb_image.h"
 
+#ifdef __APPLE__ 
+#include <GL/glew.h>
+#include "GLFW/glfw3.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#elif _WIN32 
+#include "GL/glew.h"
+#include "glfw3.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#endif
+
 //#include "log.h"
 //#include "shader_manager.h"
 //#include "utils.h"

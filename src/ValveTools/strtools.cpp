@@ -9,7 +9,13 @@
 //-----------------------------------------------------------------------------
 bool StringHasPrefix( const std::string & sString, const std::string & sPrefix )
 {
+#if defined ( _WIN32 )
 	return 0 == strnicmp( sString.c_str(), sPrefix.c_str(), sPrefix.length() );
+
+#elif defined ( __APPLE__ )
+	return 0 == strncasecmp( sString.c_str(), sPrefix.c_str(), sPrefix.length() );
+#endif
+
 }
 
 bool StringHasPrefixCaseSensitive( const std::string & sString, const std::string & sPrefix )
@@ -28,7 +34,11 @@ bool StringHasSuffix( const std::string &sString, const std::string &sSuffix )
 
 	std::string sStringSuffix = sString.substr( cStrLen - cSuffixLen, cSuffixLen );
 
+#if defined ( _WIN32 )
 	return 0 == stricmp( sStringSuffix.c_str(), sSuffix.c_str() );
+#elif defined ( __APPLE__ )
+	return 0 == strcasecmp( sStringSuffix.c_str(), sSuffix.c_str() );
+#endif
 }
 
 bool StringHasSuffixCaseSensitive( const std::string &sString, const std::string &sSuffix )

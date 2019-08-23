@@ -7,9 +7,9 @@
 
 #include "FiveCell.hpp"
 #include "VR_Manager.hpp"
-#include "Matrices.h"
-#include "Vectors.h"
-#include "openvr.h"
+//#include "Matrices.h"
+//#include "Vectors.h"
+//#include "openvr.h"
 
 #ifdef __APPLE__ 
 #include <GL/glew.h>
@@ -22,6 +22,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #endif
+
 
 class Graphics{
 

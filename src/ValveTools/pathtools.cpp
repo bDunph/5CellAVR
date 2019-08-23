@@ -18,8 +18,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #endif
-//#if defined OSX 
-#if defined __APPLE__
+#if defined OSX 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <mach-o/dyld.h>
@@ -43,8 +42,7 @@ std::string Path_GetExecutablePath()
 	std::string sPath = pchPath;
 	delete[] pchPath;
 	return sPath;
-//#elif defined( OSX ) 
-#elif defined( __APPLE__ )
+#elif defined( OSX ) 
 	char rchPath[1024];
 	uint32_t nBuff = sizeof( rchPath );
 	bool bSuccess = _NSGetExecutablePath(rchPath, &nBuff) == 0;
@@ -413,8 +411,7 @@ std::string Path_GetThisModulePath()
 	delete [] pchPath;
 	return sPath;
 
-//#elif defined( OSX ) || defined( LINUX )
-#elif defined( __APPLE__ ) || defined( LINUX )
+#elif defined( OSX ) || defined( LINUX )
 	// get the addr of a function in vrclient.so and then ask the dlopen system about it
 	Dl_info info;
 	dladdr( (void *)Path_GetThisModulePath, &info );
@@ -443,8 +440,7 @@ bool Path_IsDirectory( const std::string & sPath )
 		return false;
 	}
 
-//#if defined( LINUX ) || defined( OSX ) 
-#if defined( LINUX ) || defined( __APPLE__ ) 
+#if defined( LINUX ) || defined( OSX ) 
 	return S_ISDIR( buf.st_mode );
 #else
 	return (buf.st_mode & _S_IFDIR) != 0;
@@ -465,8 +461,7 @@ bool Path_IsDirectory( const std::string & sPath )
 /** returns true if the specified path represents an app bundle */
 bool Path_IsAppBundle( const std::string & sPath )
 {
-//#if defined(OSX) 
-#if defined(__APPLE__) 
+#if defined(OSX) 
 	NSBundle *bundle = [ NSBundle bundleWithPath: [ NSString stringWithUTF8String:sPath.c_str() ] ];
 	bool bisAppBundle = ( nullptr != bundle );
 	[ bundle release ];
@@ -802,8 +797,7 @@ std::string GetUserDocumentsPath()
 	std::string sUserPath = UTF16to8( rwchPath );
 
 	return sUserPath;
-//#elif defined( OSX ) 
-#elif defined( __APPLE__ ) 
+#elif defined( OSX ) 
 	@autoreleasepool {
 		NSArray *paths = NSSearchPathForDirectoriesInDomains( NSDocumentDirectory, NSUserDomainMask, YES );
 		if ( [paths count] == 0 )

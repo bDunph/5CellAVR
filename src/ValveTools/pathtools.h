@@ -114,7 +114,7 @@ std::string GetUserDocumentsPath();
 #define PLATSUBDIR	"win32"
 #endif
 //#elif defined(OSX) 
-#elif defined(__APPLE__) 
+#elif defined( __APPLE__ )
 #define DYNAMIC_LIB_EXT	".dylib"
 #define PLATSUBDIR	"osx32"
 #elif defined(LINUX)

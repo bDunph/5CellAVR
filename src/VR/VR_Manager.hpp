@@ -5,23 +5,14 @@
 #include <vector>
 #include <memory>
 
-#include "openvr.h"
-#include "Matrices.h"
-#include "CGLRenderModel.hpp"
 #include "VR_Helper.hpp"
+//#include "openvr.h"
+//#include "Matrices.h"
+#include "CGLRenderModel.hpp"
 #include "SystemInfo.hpp"
 
-#ifdef __APPLE__ 
-#include <GL/glew.h>
-#include "GLFW/glfw3.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#elif _WIN32 
-#include "GL/glew.h"
-#include "glfw3.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#endif
 
 class VR_Manager {
 
@@ -71,9 +62,15 @@ private:
 
 	struct ControllerInfo_t
 	{
+#ifdef __APPLE__
+		VRInputValueHandle_t m_source = vr::k_ulInvalidInputValueHandle;
+		VRActionHandle_t m_actionPose = vr::k_ulInvalidActionHandle;
+		VRActionHandle_t m_actionHaptic = vr::k_ulInvalidActionHandle;
+#elif _WIN32
 		vr::VRInputValueHandle_t m_source = vr::k_ulInvalidInputValueHandle;
 		vr::VRActionHandle_t m_actionPose = vr::k_ulInvalidActionHandle;
 		vr::VRActionHandle_t m_actionHaptic = vr::k_ulInvalidActionHandle;
+#endif
 		glm::mat4 m_rmat4Pose;
 		CGLRenderModel *m_pRenderModel = nullptr;
 		std::string m_sRenderModelName;
@@ -93,13 +90,21 @@ private:
 
 	std::vector<CGLRenderModel*> m_vecRenderModels;
 	
+#ifdef __APPLE__
+	VRActionHandle_t m_actionRotateStructure = vr::k_ulInvalidActionHandle;
+	VRActionHandle_t m_actionHideThisController = vr::k_ulInvalidActionHandle;
+	VRActionHandle_t m_actionTriggerHaptic = vr::k_ulInvalidActionHandle;
+	VRActionHandle_t m_actionAnalongInput = vr::k_ulInvalidActionHandle;
+	
+	VRActionSetHandle_t m_actionsetAvr = vr::k_ulInvalidActionSetHandle;
+#elif _WIN32
 	vr::VRActionHandle_t m_actionRotateStructure = vr::k_ulInvalidActionHandle;
 	vr::VRActionHandle_t m_actionHideThisController = vr::k_ulInvalidActionHandle;
 	vr::VRActionHandle_t m_actionTriggerHaptic = vr::k_ulInvalidActionHandle;
 	vr::VRActionHandle_t m_actionAnalongInput = vr::k_ulInvalidActionHandle;
 	
 	vr::VRActionSetHandle_t m_actionsetAvr = vr::k_ulInvalidActionSetHandle;
-
+#endif
 
 	vr::TrackedDevicePose_t m_rTrackedDevicePose[ vr::k_unMaxTrackedDeviceCount ];
 	int m_iValidPoseCount;
