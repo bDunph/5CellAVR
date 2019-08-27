@@ -3,4 +3,5 @@ build/*
 include/*
 lib/*
 .DS_Store
+data/*
 

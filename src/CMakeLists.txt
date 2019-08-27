@@ -14,7 +14,14 @@ find_package(OpenGL 4.1 REQUIRED)
 if(APPLE)
 
 	find_package(glfw3 REQUIRED)
-	find_package(GLEW REQUIRED) 
+	
+	find_library(GLEW_DYLIB GLEW "/usr/local/Cellar/glew/2.1.0/lib")
+	if(NOT GLEW_DYLIB)
+		 message(FATAL_ERROR "Glew not found")
+	endif()
+	add_library(Glew_target SHARED IMPORTED)
+	set_property(TARGET Glew_target PROPERTY IMPORTED_LOCATION "/usr/local/Cellar/glew/2.1.0/lib/libGLEW.dylib")
+	set_property(TARGET Glew_target PROPERTY IMPORTED_IMPLIB ${GLEW_DYLIB})
 
 	find_library(CSOUND_API CsoundLib64)
 	if(NOT CSOUND_API)
@@ -99,12 +106,12 @@ include_directories(
 	)
 elseif(APPLE)
 include_directories(
+
+		"/usr/local/Cellar/glew/2.1.0/include/"	
 		"/usr/local/include/"
 		"/Library/Frameworks/CsoundLib64.framework/Headers/"
 		"${PROJECT_BINARY_DIR}"
 		"${PROJECT_SOURCE_DIR}"
-		${GLEW_INCLUDE_DIRS}
-		${OPENGL_INCLUDE_DIRS}
 		"${PROJECT_SOURCE_DIR}/../include"
 		"${PROJECT_SOURCE_DIR}/FiveCell"
 		"${PROJECT_SOURCE_DIR}/Visual"
@@ -113,6 +120,7 @@ include_directories(
 		#"${PROJECT_SOURCE_DIR}/Algorithms"
 		#"${PROJECT_SOURCE_DIR}/Audio"
 	)
+
 endif()
 
 add_subdirectory(FiveCell)
@@ -127,7 +135,7 @@ endif()
 
 if(APPLE)
 	add_executable(avr main.cpp CsoundSession.cpp CsoundSession.hpp lodepng.cpp lodepng.h)
-	target_link_libraries(avr AvrApp VR ${OPENVR} Visual FiveCell glfw ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} ${CSOUND_API} ${CSOUND_PERF_THREAD})
+	target_link_libraries(avr AvrApp VR ${OPENVR} Visual FiveCell Glew_target glfw OpenGL::GL ${CSOUND_API} ${CSOUND_PERF_THREAD})
 elseif(WIN32)
 	add_executable(avr main.cpp CsoundSession.cpp CsoundSession.hpp csPerfThread.cpp csPerfThread.hpp lodepng.cpp lodepng.h)
 	target_link_libraries(avr AvrApp VR OpenVR_target ValveTools Visual FiveCell Glew_target ${GLFW_WIN} ${OPENGL_gl_LIBRARY} Csound_target Libsndfile_target)

@@ -1,21 +1,19 @@
+#include "SystemInfo.hpp"
+
 #include <cstdio>
 #include <cstdarg>
 #include <string>
 #include <iostream>
 
 #ifdef __APPLE__
-#include <GLFW/glfw3.h>
 #define vsprintf_s vsnprintf
 #elif _WIN32
-#include "glfw3.h"
 #include <windows.h>
 #endif
 
 #ifndef _WIN32
 #define APIENTRY
 #endif
-
-#include "SystemInfo.hpp"
 
 void _update_fps_counter(GLFWwindow* window){
 

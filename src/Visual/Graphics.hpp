@@ -7,20 +7,11 @@
 
 #include "FiveCell.hpp"
 #include "VR_Manager.hpp"
-//#include "Matrices.h"
-//#include "Vectors.h"
-//#include "openvr.h"
 
 #ifdef __APPLE__ 
-#include <GL/glew.h>
 #include "GLFW/glfw3.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #elif _WIN32 
-#include "GL/glew.h"
 #include "glfw3.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #endif
 
 
@@ -29,14 +20,16 @@ class Graphics{
 public:
 
 	Graphics(std::unique_ptr<ExecutionFlags>& flagPtr);
-	bool BInitGL(std::unique_ptr<VR_Manager>& vrm, bool fullscreen = false);
+	bool BInitGL(bool fullscreen = false);
 	bool BCreateDefaultShaders();
 	GLuint BCreateSceneShaders(std::string shaderName);
 	GLuint CompileGLShader( const char *pchShaderName, const char *pchVertexShader, const char *pchFragmentShader );
 	bool BSetupStereoRenderTargets(std::unique_ptr<VR_Manager>& vrm);
 	void CleanUpGL(std::unique_ptr<VR_Manager>& vrm);
-	bool BSetupCompanionWindow(std::unique_ptr<VR_Manager>& vrm);
-	void RenderFrame(std::unique_ptr<VR_Manager>& vrm);
+	bool BSetupCompanionWindow();
+	//void DevMouseCallback(GLFWwindow* window, double xpos, double ypos);
+	void DevProcessInput(GLFWwindow *window);
+	bool BRenderFrame(std::unique_ptr<VR_Manager>& vrm);
 	void RenderControllerAxes(std::unique_ptr<VR_Manager>& vrm);
 	void RenderStereoTargets(std::unique_ptr<VR_Manager>& vrm);
 	void RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm);
@@ -65,7 +58,7 @@ private:
 	GLFWwindow* m_pGLContext; // TODO: convert this to unique_ptr<>	
 
 	uint32_t m_nCompanionWindowWidth;
-	uint32_t m_nCompanionWindowHeight;
+	int32_t m_nCompanionWindowHeight;
 	uint32_t windowWidth;
 	uint32_t windowHeight;
 	GLuint m_glMainShaderProgramID;
@@ -118,6 +111,7 @@ private:
 
 	bool m_bDebugOpenGL;
 	bool m_bDebugPrintMessages;
+	bool m_bDevMode;
 
 	//GLint resolution; 
 	GLint m_gliViewEyeProjLocation;
@@ -143,7 +137,7 @@ private:
 	bool m_bRecordScreen;
 
 	//time_t m_tStartTime;
-	unsigned int m_uiFrameNumber;
+	//unsigned int m_uiFrameNumber;
 
 	//shader handles
 	GLuint skyboxShaderProg;
@@ -164,5 +158,15 @@ private:
 	//GLint quad_viewMatLoc;
 	//GLint quad_modelMatLoc;
 
+	//dev mode
+	glm::mat4 m_matDevProjMatrix;
+	glm::mat4 m_matDevViewMatrix;
+	glm::vec3 m_vec3DevCamPos;
+	glm::vec3 m_vec3DevCamUp;
+
+	float m_fDeltaTime;
+	float m_fLastFrame;	
 };
+
+
 #endif

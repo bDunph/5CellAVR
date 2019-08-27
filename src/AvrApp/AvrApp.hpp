@@ -19,13 +19,15 @@ public:
 	
 private:
 	
-	bool m_bDebugGL;
-	bool m_bVSyncBlank;
-	bool m_bOpenGLFinishHack;
-	bool m_bPrintDebugMsgs;
 	std::unique_ptr<VR_Manager> m_pVR;
 	std::unique_ptr<Graphics> m_pGraphics;
 	//std::unique_ptr<CsoundSession> m_pAudio;
 	std::unique_ptr<ExecutionFlags> m_pExFlags;
+
+	bool m_bDebugGL;
+	bool m_bVSyncBlank;
+	bool m_bOpenGLFinishHack;
+	bool m_bPrintDebugMsgs;
+	bool m_bDevMode;
 };
 #endif

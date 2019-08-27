@@ -16,7 +16,9 @@ AvrApp::AvrApp(int argc, char** argv) :
 	m_bDebugGL(false),
 	m_bVSyncBlank(true),
 	m_bOpenGLFinishHack(true),
-	m_bPrintDebugMsgs(false) {
+	m_bPrintDebugMsgs(false),
+	m_bDevMode(false)  
+{
 
 	for( int i = 0; i < argc; i++ )
 	{
@@ -36,11 +38,11 @@ AvrApp::AvrApp(int argc, char** argv) :
 		{
 			m_bPrintDebugMsgs = true;
 		}
+		else if(!_stricmp(argv[i], "-dev"))
+		{
+			m_bDevMode = true;
+		}
 	}	
-}
-
-//--------------------------------------------
-bool AvrApp::BInitialise(){
 
 	m_pExFlags = std::make_unique<ExecutionFlags>();
 
@@ -48,39 +50,48 @@ bool AvrApp::BInitialise(){
 	m_pExFlags->flagVBlank = m_bVSyncBlank;
 	m_pExFlags->flagGLFinishHack = m_bOpenGLFinishHack;
 	m_pExFlags->flagDPrint = m_bPrintDebugMsgs;
+	m_pExFlags->flagDevMode = m_bDevMode;
+}
 
-	//initialise OpenVR
-	m_pVR = std::make_unique<VR_Manager>(m_pExFlags);
+//--------------------------------------------
+bool AvrApp::BInitialise(){
 
-	if(!m_pVR->BInit()){
-		std::cout << "Error: OpenVR system not initialised!" << std::endl;
-		return false;
-	} else if(!m_pVR->BInitCompositor()){
-		std::cout << "Error: OpenVR compositor not initialised!" << std::endl;
-		return false;
-	} else if(!m_pVR->BSetupCameras()){ 
-		std::cout << "Error: Cameras not set up" << std::endl;
-		return false;
+	
+	if(!m_pExFlags->flagDevMode){
+		//initialise OpenVR
+		m_pVR = std::make_unique<VR_Manager>(m_pExFlags);
+
+		if(!m_pVR->BInit()){
+			std::cout << "Error: OpenVR system not initialised!" << std::endl;
+			return false;
+		} else if(!m_pVR->BInitCompositor()){
+			std::cout << "Error: OpenVR compositor not initialised!" << std::endl;
+			return false;
+		} else if(!m_pVR->BSetupCameras()){ 
+			std::cout << "Error: Cameras not set up" << std::endl;
+			return false;
+		}
+
+		std::cout << "OpenVR initialised" << std::endl;
 	}
-
-	std::cout << "OpenVR initialised" << std::endl;
 
 	//initialise OpenGL
 	m_pGraphics = std::make_unique<Graphics>(m_pExFlags);
 
-	if(!m_pGraphics->BInitGL(m_pVR)){
+	if(!m_pGraphics->BInitGL()){
 		std::cout << "Error: OpenGL context not initialised!" << std::endl;
 		return false;
 	} else if(!m_pGraphics->BCreateDefaultShaders()){
 		std::cout << "Error: Default shaders not set up" << std::endl;
 		return false;
-	} else if(!m_pGraphics->BSetupStereoRenderTargets(m_pVR)){
-		std::cout << "Error: Stereo render targets no set up" << std::endl;
-		return false;
-	} else if(!m_pGraphics->BSetupCompanionWindow(m_pVR)){
+	}  else if(!m_pGraphics->BSetupCompanionWindow()){
 		std::cout << "Error: Companion window not set up" << std::endl;
 		return false;
-	} 
+	} else if(!m_pGraphics->BSetupStereoRenderTargets(m_pVR)){
+			std::cout << "Error: Stereo render targets no set up" << std::endl;
+			return false;
+	}
+
 	std::cout << "OpenGL initialised" << std::endl;
 	
 	//initialise CSound
@@ -105,9 +116,10 @@ void AvrApp::RunMainLoop(){
 
 	while (!bQuit)
 	{
-		bQuit = m_pVR->HandleInput();
-
-		m_pGraphics->RenderFrame(m_pVR);
+		if(!m_pExFlags->flagDevMode){
+			bQuit = m_pVR->HandleInput();
+		}
+		bQuit = m_pGraphics->BRenderFrame(m_pVR);
 
 		bQuit = m_pGraphics->TempEsc();
 	}
@@ -118,6 +130,9 @@ void AvrApp::RunMainLoop(){
 // ----------------------------------------
 void AvrApp::Exit(){
 
-	m_pVR->ExitVR();
+	if(!m_pExFlags->flagDevMode){
+		m_pVR->ExitVR();
+	}
+
 	m_pGraphics->CleanUpGL(m_pVR);
 }

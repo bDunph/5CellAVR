@@ -18,6 +18,14 @@
 #define _countof(x) (sizeof(x)/sizeof((x)[0]))
 #endif
 
+//******** TERRIBLE GLOBAL VARIABLES HAVE TO FIX THIS WHEN I GET A CHANCE**********//
+bool m_bFirstMouse = true;
+double m_dLastX = 320.0f;
+double m_dLastY = 160.0f;
+float m_fYaw = 0.0f;
+float m_fPitch = 0.0f;	
+glm::vec3 m_vec3DevCamFront;
+
 //-----------------------------------------------------------------------
 // Constructor
 // ----------------------------------------------------------------------
@@ -41,12 +49,15 @@ Graphics::Graphics(std::unique_ptr<ExecutionFlags>& flagPtr) :
 	m_bGLFinishHack(true),
 	m_bDebugOpenGL(false),
 	m_unImageCount(0),
-	m_uiFrameNumber(0)
+	m_fDeltaTime(0.0),
+	m_fLastFrame(0.0)
+	//m_uiFrameNumber(0)
 {
 	m_bDebugOpenGL = flagPtr->flagDebugOpenGL;
 	m_bVblank = flagPtr->flagVBlank;
 	m_bGLFinishHack = flagPtr->flagGLFinishHack;
 	m_bDebugPrintMessages = flagPtr->flagDPrint;	
+	m_bDevMode = flagPtr->flagDevMode;
 
 	m_pRotationVal = std::make_unique<int>();
 	*m_pRotationVal = 0;
@@ -62,7 +73,7 @@ Graphics::Graphics(std::unique_ptr<ExecutionFlags>& flagPtr) :
 //----------------------------------------------------------------------
 // Initialise OpenGL context, companion window, glew and vsync.
 // ---------------------------------------------------------------------	
-bool Graphics::BInitGL(std::unique_ptr<VR_Manager>& vrm, bool fullscreen){
+bool Graphics::BInitGL(bool fullscreen){
 	
 	//start gl context and O/S window using the glfw helper library
 	if(!glfwInit()){
@@ -165,6 +176,16 @@ bool Graphics::BInitGL(std::unique_ptr<VR_Manager>& vrm, bool fullscreen){
 		std::cout << "fiveCell setup failed: Graphics BInitGL" << std::endl;
 		return false;
 	}
+
+	//create matrices for devmode
+	if(m_bDevMode){
+		m_matDevProjMatrix = glm::perspective(45.0f, (float)m_nCompanionWindowWidth/ (float)m_nCompanionWindowHeight, 0.1f, 1000.0f);
+		
+		//variables for view matrix
+		m_vec3DevCamPos = glm::vec3(0.0f, 2.0f, 3.0f);	
+		m_vec3DevCamUp = glm::vec3(0.0f, 1.0f, 0.0f);
+		m_vec3DevCamFront = glm::vec3(0.0f, 0.0f, -1.0f);
+}	
 
 //***********************************************************************************************
 // Quad to test texture rendering
@@ -307,13 +328,6 @@ GLuint Graphics::BCreateSceneShaders(std::string shaderName){
 	bool didShadersLink = shader_link_check(shaderProg);
 	if(!didShadersLink) return NULL;
 
-	//only use during development as computationally expensive
-	bool validProgram = is_valid(shaderProg);
-	if(!validProgram){
-		fprintf(stderr, "ERROR: shaderProg not valid\n");
-		return NULL;
-	}
-
 	return shaderProg;
 }
 
@@ -322,69 +336,71 @@ GLuint Graphics::BCreateSceneShaders(std::string shaderName){
 //-----------------------------------------------------------------------------
 bool Graphics::BCreateDefaultShaders()
 {
-	m_unControllerTransformProgramID = CompileGLShader(
-		"Controller",
+	if(!m_bDevMode){
+		m_unControllerTransformProgramID = CompileGLShader(
+			"Controller",
 
-		// vertex shader
-		"#version 410\n"
-		"uniform mat4 matrix;\n"
-		"layout(location = 0) in vec4 position;\n"
-		"layout(location = 1) in vec3 v3ColorIn;\n"
-		"out vec4 v4Color;\n"
-		"void main()\n"
-		"{\n"
-		"	v4Color.xyz = v3ColorIn; v4Color.a = 1.0;\n"
-		"	gl_Position = matrix * position;\n"
-		"}\n",
+			// vertex shader
+			"#version 410\n"
+			"uniform mat4 matrix;\n"
+			"layout(location = 0) in vec4 position;\n"
+			"layout(location = 1) in vec3 v3ColorIn;\n"
+			"out vec4 v4Color;\n"
+			"void main()\n"
+			"{\n"
+			"	v4Color.xyz = v3ColorIn; v4Color.a = 1.0;\n"
+			"	gl_Position = matrix * position;\n"
+			"}\n",
 
-		// fragment shader
-		"#version 410\n"
-		"in vec4 v4Color;\n"
-		"out vec4 outputColor;\n"
-		"void main()\n"
-		"{\n"
-		"   outputColor = v4Color;\n"
-		"}\n"
-		);
-	m_nControllerMatrixLocation = glGetUniformLocation(m_unControllerTransformProgramID, "matrix");
-	if(m_nControllerMatrixLocation == -1)
-	{
-		std::cout << "Unable to find matrix uniform in controller shader\n" << std::endl;;
-		return false;
-	}
+			// fragment shader
+			"#version 410\n"
+			"in vec4 v4Color;\n"
+			"out vec4 outputColor;\n"
+			"void main()\n"
+			"{\n"
+			"   outputColor = v4Color;\n"
+			"}\n"
+			);
+		m_nControllerMatrixLocation = glGetUniformLocation(m_unControllerTransformProgramID, "matrix");
+		if(m_nControllerMatrixLocation == -1)
+		{
+			std::cout << "Unable to find matrix uniform in controller shader\n" << std::endl;;
+			return false;
+		}
 
-	m_unRenderModelProgramID = CompileGLShader( 
-		"render model",
+		m_unRenderModelProgramID = CompileGLShader( 
+			"render model",
 
-		// vertex shader
-		"#version 410\n"
-		"uniform mat4 matrix;\n"
-		"layout(location = 0) in vec4 position;\n"
-		"layout(location = 1) in vec3 v3NormalIn;\n"
-		"layout(location = 2) in vec2 v2TexCoordsIn;\n"
-		"out vec2 v2TexCoord;\n"
-		"void main()\n"
-		"{\n"
-		"	v2TexCoord = v2TexCoordsIn;\n"
-		"	gl_Position = matrix * vec4(position.xyz, 1);\n"
-		"}\n",
+			// vertex shader
+			"#version 410\n"
+			"uniform mat4 matrix;\n"
+			"layout(location = 0) in vec4 position;\n"
+			"layout(location = 1) in vec3 v3NormalIn;\n"
+			"layout(location = 2) in vec2 v2TexCoordsIn;\n"
+			"out vec2 v2TexCoord;\n"
+			"void main()\n"
+			"{\n"
+			"	v2TexCoord = v2TexCoordsIn;\n"
+			"	gl_Position = matrix * vec4(position.xyz, 1);\n"
+			"}\n",
 
-		//fragment shader
-		"#version 410 core\n"
-		"uniform sampler2D diffuse;\n"
-		"in vec2 v2TexCoord;\n"
-		"out vec4 outputColor;\n"
-		"void main()\n"
-		"{\n"
-		"   outputColor = texture( diffuse, v2TexCoord);\n"
-		"}\n"
+			//fragment shader
+			"#version 410 core\n"
+			"uniform sampler2D diffuse;\n"
+			"in vec2 v2TexCoord;\n"
+			"out vec4 outputColor;\n"
+			"void main()\n"
+			"{\n"
+			"   outputColor = texture( diffuse, v2TexCoord);\n"
+			"}\n"
 
-		);
-	m_nRenderModelMatrixLocation = glGetUniformLocation( m_unRenderModelProgramID, "matrix" );
-	if(m_nRenderModelMatrixLocation == -1)
-	{
-		std::cout << "Unable to find matrix uniform in render model shader\n" << std::endl;
-		return false;
+			);
+		m_nRenderModelMatrixLocation = glGetUniformLocation( m_unRenderModelProgramID, "matrix" );
+		if(m_nRenderModelMatrixLocation == -1)
+		{
+			std::cout << "Unable to find matrix uniform in render model shader\n" << std::endl;
+			return false;
+		}
 	}
 
 	m_unCompanionWindowProgramID = CompileGLShader(
@@ -412,9 +428,13 @@ bool Graphics::BCreateDefaultShaders()
 		"}\n"
 		);
 
-	return m_unControllerTransformProgramID != 0
-		&& m_unRenderModelProgramID != 0
-		&& m_unCompanionWindowProgramID != 0;
+	if(!m_bDevMode){
+		return m_unControllerTransformProgramID != 0
+			&& m_unRenderModelProgramID != 0
+			&& m_unCompanionWindowProgramID != 0;
+	} 
+
+	return m_unCompanionWindowProgramID != 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -480,14 +500,21 @@ GLuint Graphics::CompileGLShader( const char *pchShaderName, const char *pchVert
 //-----------------------------------------------------------------------------
 bool Graphics::BSetupStereoRenderTargets(std::unique_ptr<VR_Manager>& vrm)
 {
-	if ( !vrm->m_pHMD )
+	if (!m_bDevMode && vrm != nullptr){
+		vrm->m_pHMD->GetRecommendedRenderTargetSize( &m_nRenderWidth, &m_nRenderHeight );
+	} else if (!m_bDevMode && vrm == nullptr){
 		return false;
-
-	vrm->m_pHMD->GetRecommendedRenderTargetSize( &m_nRenderWidth, &m_nRenderHeight );
+	}
 
 	bool fboL = BCreateFrameBuffer(leftEyeDesc);
-	bool fboR = BCreateFrameBuffer(rightEyeDesc);
-	if(!fboL || !fboR) return false;
+
+	if(!m_bDevMode){
+		bool fboR = BCreateFrameBuffer(rightEyeDesc);
+
+		if(!fboL || !fboR) return false;
+	}
+
+	if(!fboL) return false;
 
 	return true;
 }
@@ -538,11 +565,8 @@ bool Graphics::BCreateFrameBuffer(FramebufferDesc& framebufferDesc)
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-bool Graphics::BSetupCompanionWindow(std::unique_ptr<VR_Manager>& vrm)
+bool Graphics::BSetupCompanionWindow()
 {
-	if ( !vrm->m_pHMD )
-		return false;
-
 	std::vector<VertexDataWindow> vVerts;
 
 	// left eye verts
@@ -589,18 +613,65 @@ bool Graphics::BSetupCompanionWindow(std::unique_ptr<VR_Manager>& vrm)
 	return true;
 }
 
+//to keep track of mouse movement
+void DevMouseCallback(GLFWwindow* window, double xpos, double ypos){
+
+	if(m_bFirstMouse) // this bool variable is initially set to true
+	{
+    		m_dLastX = xpos;
+    		m_dLastY = ypos;
+    		m_bFirstMouse = false;
+	}
+	
+	float xOffset = xpos - m_dLastX;
+	float yOffset = m_dLastY - ypos;
+	m_dLastX = xpos;
+	m_dLastY = ypos;
+	
+	float sensitivity = 0.05f;
+	xOffset *= sensitivity;
+	yOffset *= sensitivity;	
+	
+	m_fYaw += xOffset;
+	m_fPitch += yOffset;
+	
+	if(m_fPitch > 89.0f)
+  		m_fPitch =  89.0f;
+	if(m_fPitch < -89.0f)
+  		m_fPitch = -89.0f; 
+
+	glm::vec3 front;
+    	front.x = cos(glm::radians(m_fYaw)) * cos(glm::radians(m_fPitch));
+    	front.y = sin(glm::radians(m_fPitch));
+    	front.z = sin(glm::radians(m_fYaw)) * cos(glm::radians(m_fPitch));
+    	m_vec3DevCamFront = glm::normalize(front);	
+}
+
+
+void Graphics::DevProcessInput(GLFWwindow *window){
+	
+	float cameraSpeed = 5.0f * m_fDeltaTime; // adjust accordingly
+    	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        	m_vec3DevCamPos += cameraSpeed * m_vec3DevCamFront;
+    	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        	m_vec3DevCamPos -= cameraSpeed * m_vec3DevCamFront;
+    	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        	m_vec3DevCamPos -= glm::normalize(glm::cross(m_vec3DevCamFront, m_vec3DevCamUp)) * cameraSpeed;
+    	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        	m_vec3DevCamPos += glm::normalize(glm::cross(m_vec3DevCamFront, m_vec3DevCamUp)) * cameraSpeed;	
+	
+	if(m_vec3DevCamPos.y < 2.0f || m_vec3DevCamPos.y > 2.0f) m_vec3DevCamPos.y = 2.0f;
+}
 //-----------------------------------------------------------------------------
 // Main function that renders textures to hmd.
 //-----------------------------------------------------------------------------
-void Graphics::RenderFrame(std::unique_ptr<VR_Manager>& vrm)
+bool Graphics::BRenderFrame(std::unique_ptr<VR_Manager>& vrm)
 {
-
-	
 	//update values from controller actions
 	//if(vrm->BGetRotate3DTrigger()) IncreaseRotationValue(m_pRotationVal);
 
 	// for now as fast as possible
-	if ( vrm->m_pHMD )
+	if ( !m_bDevMode && vrm->m_pHMD )
 	{
 		RenderControllerAxes(vrm);
 		RenderStereoTargets(vrm);
@@ -610,8 +681,20 @@ void Graphics::RenderFrame(std::unique_ptr<VR_Manager>& vrm)
 		vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
 		vr::Texture_t rightEyeTexture = {(void*)(uintptr_t)rightEyeDesc.m_nResolveTextureId, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
 		vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
+	} else if(m_bDevMode && vrm == nullptr){
+		
+		float currentFrame = glfwGetTime();
+		m_fDeltaTime = currentFrame - m_fLastFrame;
+		DevProcessInput(m_pGLContext);
+		glfwSetCursorPosCallback(m_pGLContext, DevMouseCallback);
+		RenderStereoTargets(vrm);
+		RenderCompanionWindow();
+		m_fLastFrame = currentFrame;
+	} else if(!m_bDevMode && vrm == nullptr){
+		std::cout << "ERROR: vrm not assigned : RenderFrame()" << std::endl;
+		return true;
 	}
-
+		
 	if (m_bVblank && m_bGLFinishHack)
 	{
 		//$ HACKHACK. From gpuview profiling, it looks like there is a bug where two renders and a present
@@ -641,18 +724,22 @@ void Graphics::RenderFrame(std::unique_ptr<VR_Manager>& vrm)
 		glFinish();
 	}
 
-	// Spew out the controller and pose count whenever they change.
-	if (m_iTrackedControllerCount != m_iTrackedControllerCount_Last || vrm->m_iValidPoseCount != m_iValidPoseCount_Last )
-	{
-		m_iValidPoseCount_Last = vrm->m_iValidPoseCount;
-		m_iTrackedControllerCount_Last = m_iTrackedControllerCount;
-		
-		std::printf( "PoseCount:%d(%s) Controllers:%d\n", vrm->m_iValidPoseCount, m_strPoseClasses.c_str(), m_iTrackedControllerCount );
-	}
+	if(!m_bDevMode){
+		// Spew out the controller and pose count whenever they change.
+		if (m_iTrackedControllerCount != m_iTrackedControllerCount_Last || vrm->m_iValidPoseCount != m_iValidPoseCount_Last )
+		{
+			m_iValidPoseCount_Last = vrm->m_iValidPoseCount;
+			m_iTrackedControllerCount_Last = m_iTrackedControllerCount;
+			
+			std::printf( "PoseCount:%d(%s) Controllers:%d\n", vrm->m_iValidPoseCount, m_strPoseClasses.c_str(), m_iTrackedControllerCount );
+		}
 
-	vrm->UpdateHMDMatrixPose();
+		vrm->UpdateHMDMatrixPose();
+		return false;
+	} 
 
-	m_uiFrameNumber++;
+	return false;
+	//m_uiFrameNumber++;
 	//std::cout << *m_pRotationVal << std::endl;
 }
 
@@ -781,30 +868,33 @@ void Graphics::RenderStereoTargets(std::unique_ptr<VR_Manager>& vrm)
 	glDisable(GL_MULTISAMPLE);
 	 	
  	glBindFramebuffer(GL_READ_FRAMEBUFFER, leftEyeDesc.m_nRenderFramebufferId);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, leftEyeDesc.m_nResolveFramebufferId);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, leftEyeDesc.m_nResolveFramebufferId);
 
    	glBlitFramebuffer(0, 0, m_nRenderWidth, m_nRenderHeight, 0, 0, m_nRenderWidth, m_nRenderHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-	glEnable(GL_MULTISAMPLE);
-	
-	// Right Eye
-	glBindFramebuffer(GL_FRAMEBUFFER, rightEyeDesc.m_nRenderFramebufferId);
-	glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
-	RenderScene(vr::Eye_Right, vrm);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	if(!m_bDevMode && vrm != nullptr){
 
-	glDisable(GL_MULTISAMPLE);
+		glEnable(GL_MULTISAMPLE);
+		
+		// Right Eye
+		glBindFramebuffer(GL_FRAMEBUFFER, rightEyeDesc.m_nRenderFramebufferId);
+		glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
+		RenderScene(vr::Eye_Right, vrm);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, rightEyeDesc.m_nRenderFramebufferId);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, rightEyeDesc.m_nResolveFramebufferId);
+		glDisable(GL_MULTISAMPLE);
 
-	glBlitFramebuffer(0, 0, m_nRenderWidth, m_nRenderHeight, 0, 0, m_nRenderWidth, m_nRenderHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, rightEyeDesc.m_nRenderFramebufferId);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, rightEyeDesc.m_nResolveFramebufferId);
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBlitFramebuffer(0, 0, m_nRenderWidth, m_nRenderHeight, 0, 0, m_nRenderWidth, m_nRenderHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -813,15 +903,25 @@ void Graphics::RenderStereoTargets(std::unique_ptr<VR_Manager>& vrm)
 void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 {
 
+	glm::mat4 currentProjMatrix;
+	glm::mat4 currentViewMatrix;
+	glm::mat4 currentEyeMatrix;
+
 	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
-	glm::mat4 currentProjMatrix = vrm->GetCurrentProjectionMatrix(nEye);
-	glm::mat4 currentViewMatrix = vrm->GetCurrentViewMatrix(nEye);
-	glm::mat4 currentEyeMatrix = vrm->GetCurrentEyeMatrix(nEye);
-	glm::mat4 viewEyeMatrix = currentEyeMatrix * currentViewMatrix;
-	glm::mat4 viewEyeProjMatrix = currentProjMatrix * currentEyeMatrix * currentViewMatrix;
+	if(!m_bDevMode){
+		currentProjMatrix = vrm->GetCurrentProjectionMatrix(nEye);
+		currentViewMatrix = vrm->GetCurrentViewMatrix(nEye);
+		currentEyeMatrix = vrm->GetCurrentEyeMatrix(nEye);
+	} else {
+		//*** put manual matrices here***//
+		currentProjMatrix = m_matDevProjMatrix;  
+		m_matDevViewMatrix = glm::lookAt(m_vec3DevCamPos, m_vec3DevCamPos + m_vec3DevCamFront, m_vec3DevCamUp);	
+		currentViewMatrix = m_matDevViewMatrix;
+		currentEyeMatrix = glm::mat4(1.0f);
+	}
 
 	////draw texture quad
 	//glBindVertexArray(quadVAO);
@@ -840,40 +940,43 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 	//glBindVertexArray(0);
 
 	//update variables for fiveCell
-	fiveCell.update(currentProjMatrix, currentViewMatrix, viewEyeMatrix);
-
+	fiveCell.update(currentProjMatrix, currentViewMatrix);
+	
 	//draw fiveCell scene
-	fiveCell.draw(skyboxShaderProg, groundPlaneShaderProg, soundObjShaderProg, fiveCellShaderProg, quadShaderProg, currentProjMatrix, viewEyeMatrix, currentViewMatrix, currentEyeMatrix);
+	fiveCell.draw(skyboxShaderProg, groundPlaneShaderProg, soundObjShaderProg, fiveCellShaderProg, quadShaderProg, currentProjMatrix, currentViewMatrix, currentEyeMatrix);
 
-	bool bIsInputAvailable = vrm->m_pHMD->IsInputAvailable();
+	if(!m_bDevMode && vrm){
+	
+		bool bIsInputAvailable = vrm->m_pHMD->IsInputAvailable();
 
-	if (bIsInputAvailable)
-	{
-		// draw the controller axis lines
-		glUseProgram(m_unControllerTransformProgramID);
-		glUniformMatrix4fv(m_nControllerMatrixLocation, 1, GL_FALSE, &vrm->GetCurrentViewProjectionMatrix(nEye)[0][0]);
-		glBindVertexArray(m_unControllerVAO);
-		glDrawArrays(GL_LINES, 0, m_uiControllerVertCount);
-		glBindVertexArray(0);
+		if (bIsInputAvailable)
+		{
+			// draw the controller axis lines
+			glUseProgram(m_unControllerTransformProgramID);
+			glUniformMatrix4fv(m_nControllerMatrixLocation, 1, GL_FALSE, &vrm->GetCurrentViewProjectionMatrix(nEye)[0][0]);
+			glBindVertexArray(m_unControllerVAO);
+			glDrawArrays(GL_LINES, 0, m_uiControllerVertCount);
+			glBindVertexArray(0);
+		}
+
+		// ----- Render Model rendering -----
+		glUseProgram(m_unRenderModelProgramID);
+
+		// this for loop should use eHand iterators from VR_Manager
+		for (int i = 0; i <= 1; i++)
+		{
+			if (!vrm->m_rHand[i].m_bShowController || !vrm->m_rHand[i].m_pRenderModel)
+				continue;
+
+			const glm::mat4& matDeviceToTracking = vrm->m_rHand[i].m_rmat4Pose;
+			glm::mat4 matMVP = vrm->GetCurrentViewProjectionMatrix(nEye) * matDeviceToTracking;
+			glUniformMatrix4fv(m_nRenderModelMatrixLocation, 1, GL_FALSE, &matMVP[0][0]);
+
+			vrm->m_rHand[i].m_pRenderModel->Draw();
+		}
+
+		glUseProgram(0);
 	}
-
-	// ----- Render Model rendering -----
-	glUseProgram(m_unRenderModelProgramID);
-
-	// this for loop should use eHand iterators from VR_Manager
-	for (int i = 0; i <= 1; i++)
-	{
-		if (!vrm->m_rHand[i].m_bShowController || !vrm->m_rHand[i].m_pRenderModel)
-			continue;
-
-		const glm::mat4& matDeviceToTracking = vrm->m_rHand[i].m_rmat4Pose;
-		glm::mat4 matMVP = vrm->GetCurrentViewProjectionMatrix(nEye) * matDeviceToTracking;
-		glUniformMatrix4fv(m_nRenderModelMatrixLocation, 1, GL_FALSE, &matMVP[0][0]);
-
-		vrm->m_rHand[i].m_pRenderModel->Draw();
-	}
-
-	glUseProgram(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -983,11 +1086,13 @@ void Graphics::CleanUpGL(std::unique_ptr<VR_Manager>& vrm){
 		glDeleteTextures( 1, &leftEyeDesc.m_nResolveTextureId );
 		glDeleteFramebuffers( 1, &leftEyeDesc.m_nResolveFramebufferId );
 
-		glDeleteRenderbuffers( 1, &rightEyeDesc.m_nDepthBufferId );
-		glDeleteTextures( 1, &rightEyeDesc.m_nRenderTextureId );
-		glDeleteFramebuffers( 1, &rightEyeDesc.m_nRenderFramebufferId );
-		glDeleteTextures( 1, &rightEyeDesc.m_nResolveTextureId );
-		glDeleteFramebuffers( 1, &rightEyeDesc.m_nResolveFramebufferId );
+		if(!m_bDevMode && vrm){
+			glDeleteRenderbuffers( 1, &rightEyeDesc.m_nDepthBufferId );
+			glDeleteTextures( 1, &rightEyeDesc.m_nRenderTextureId );
+			glDeleteFramebuffers( 1, &rightEyeDesc.m_nRenderFramebufferId );
+			glDeleteTextures( 1, &rightEyeDesc.m_nResolveTextureId );
+			glDeleteFramebuffers( 1, &rightEyeDesc.m_nResolveFramebufferId );
+		}
 
 		if( m_unCompanionWindowVAO != 0 )
 		{

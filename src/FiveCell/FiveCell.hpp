@@ -12,8 +12,8 @@ class FiveCell {
 
 public:
 	bool setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GLuint groundPlaneProg, GLuint fiveCellProg, GLuint quadShaderProg);
-	void update(glm::mat4 projMat, glm::mat4 viewMat, glm::mat4 viewEyeMat);
-	void draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, GLuint quadShaderProg, glm::mat4 projMat, glm::mat4 viewEyeMat, glm::mat4 viewMat, glm::mat4 eyeMat);
+	void update(glm::mat4 projMat, glm::mat4 viewMat);
+	void draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, GLuint quadShaderProg, glm::mat4 projMat, glm::mat4 viewMat, glm::mat4 eyeMat);
 	void exit();
 
 private:

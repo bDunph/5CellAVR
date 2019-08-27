@@ -11,19 +11,13 @@
 #include "stb_image.h"
 
 #ifdef __APPLE__ 
-#include <GL/glew.h>
 #include "GLFW/glfw3.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #elif _WIN32 
-#include "GL/glew.h"
 #include "glfw3.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #endif
 
 //#include "log.h"
-//#include "shader_manager.h"
+#include "ShaderManager.hpp"
 //#include "utils.h"
 
 #define PI 3.14159265359
@@ -449,6 +443,13 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 
 	//skybox_texUniformLoc = glGetUniformLocation(skyboxProg, "skybox");
 
+	//only use during development as computationally expensive
+	bool validProgram = is_valid(skyboxProg);
+	if(!validProgram){
+		fprintf(stderr, "ERROR: skyboxhaderProg not valid\n");
+		return 1;
+	}
+
 	glBindVertexArray(0);
 
 	skyboxModelMatrix = modelMatrix;
@@ -732,6 +733,13 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 	cameraPosLoc = glGetUniformLocation(fiveCellProg, "camPos");
 
 	alphaLoc = glGetUniformLocation(fiveCellProg, "alpha");
+	
+	//only use during development as computationally expensive
+	//bool validProgram = is_valid(fiveCellProg);
+	//if(!validProgram){
+	//	fprintf(stderr, "ERROR: fiveCellShaderProg not valid\n");
+	//	return 1;
+	//}
 
 	glBindVertexArray(0);
 
@@ -754,7 +762,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 
 }
 
-void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::mat4 viewEyeMat){
+void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat){
 
 //***********************************************************************************************************
 // Update Stuff Here
@@ -852,11 +860,13 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::mat4 viewEyeMat
 		
 }
 
-void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, GLuint quadShaderProg, glm::mat4 projMat, glm::mat4 viewEyeMat, glm::mat4 viewMat, glm::mat4 eyeMat){
+void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, GLuint quadShaderProg, glm::mat4 projMat, glm::mat4 viewMat, glm::mat4 eyeMat){
 		
 //**********************************************************************************************************
 // Draw Stuff Here
 //*********************************************************************************************************
+
+	glm::mat4 viewEyeMat = viewMat * eyeMat;
 
 	camPosPerEye = glm::vec3(viewEyeMat[3][0], viewEyeMat[3][1], viewEyeMat[3][2]);
 
@@ -961,7 +971,7 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 	//draw skybox
 	//skybox.draw(projMat, viewEyeMat, skyboxProg);
 	glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(viewEyeMat));
-	glm::mat4 viewNTEyeMat = eyeMat * viewNoTranslation; 
+	//glm::mat4 viewNTEyeMat = eyeMat * viewNoTranslation; 
 		
 	//glm::mat4 viewNTEyeMat = glm::mat4(
 	//		viewEyeMat[0][0], viewEyeMat[1][0], viewEyeMat[2][0], 0.0f,
@@ -978,7 +988,7 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 	//glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexID);
 	glUseProgram(skyboxProg);
-		
+	
 	//glUniform1i(skybox_texUniformLoc, 0);
 	glUniformMatrix4fv(skybox_projMatLoc, 1, GL_FALSE, &projMat[0][0]);
 	glUniformMatrix4fv(skybox_viewMatLoc, 1, GL_FALSE, &viewNoTranslation[0][0]);

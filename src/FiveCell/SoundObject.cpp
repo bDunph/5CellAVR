@@ -1,5 +1,5 @@
 #include "SoundObject.hpp"
-//#include "shader_manager.h"
+#include "ShaderManager.hpp"
 
 #ifdef __APPLE__ 
 #include "GLFW/glfw3.h"
@@ -108,6 +108,13 @@ bool SoundObject::setup(GLuint soundObjProg){
 
 	soundObj_cameraPosLoc = glGetUniformLocation(soundObjProg, "camPos");
 	
+	//only use during development as computationally expensive
+	bool validProgram = is_valid(soundObjProg);
+	if(!validProgram){
+		fprintf(stderr, "ERROR: soundObjProg not valid\n");
+		return 1;
+	}
+
 	glBindVertexArray(0);
 	
 	identityModelMat = glm::mat4(1.0);
