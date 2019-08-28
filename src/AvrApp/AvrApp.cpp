@@ -81,16 +81,16 @@ bool AvrApp::BInitialise(){
 	if(!m_pGraphics->BInitGL()){
 		std::cout << "Error: OpenGL context not initialised!" << std::endl;
 		return false;
-	} else if(!m_pGraphics->BCreateDefaultShaders()){
+	} else if(!m_pGraphics->BSetupStereoRenderTargets(m_pVR)){
+			std::cout << "Error: Stereo render targets not set up" << std::endl;
+			return false;
+	}else if(!m_pGraphics->BCreateDefaultShaders()){
 		std::cout << "Error: Default shaders not set up" << std::endl;
 		return false;
 	}  else if(!m_pGraphics->BSetupCompanionWindow()){
 		std::cout << "Error: Companion window not set up" << std::endl;
 		return false;
-	} else if(!m_pGraphics->BSetupStereoRenderTargets(m_pVR)){
-			std::cout << "Error: Stereo render targets no set up" << std::endl;
-			return false;
-	}
+	} 
 
 	std::cout << "OpenGL initialised" << std::endl;
 	

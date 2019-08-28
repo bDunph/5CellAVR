@@ -185,6 +185,10 @@ bool Graphics::BInitGL(bool fullscreen){
 		m_vec3DevCamPos = glm::vec3(0.0f, 2.0f, 3.0f);	
 		m_vec3DevCamUp = glm::vec3(0.0f, 1.0f, 0.0f);
 		m_vec3DevCamFront = glm::vec3(0.0f, 0.0f, -1.0f);
+
+		//values for framebuffer setup to make up for no headset
+		m_nRenderWidth = m_nCompanionWindowWidth;
+		m_nRenderHeight = m_nCompanionWindowHeight; 
 }	
 
 //***********************************************************************************************
@@ -550,10 +554,10 @@ bool Graphics::BCreateFrameBuffer(FramebufferDesc& framebufferDesc)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferDesc.m_nResolveTextureId, 0);
 
 	// check FBO status
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)
 	{
-		std::cout << "Error: Frame buffer not created : Graphics::BCreateFrameBuffer" << std::endl;
+		std::cout << "Error: Frame buffer not created : " << std::to_string(status) << " -- Graphics::BCreateFrameBuffer" << std::endl;
 		return false;
 	}
 
