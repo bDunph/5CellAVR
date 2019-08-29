@@ -113,6 +113,9 @@ bool Graphics::BInitGL(bool fullscreen){
 		return false;
 	}
 	glfwMakeContextCurrent(m_pGLContext);
+	
+	//setup for mouse camera control by disabling the cursor while the program is running 
+	glfwSetInputMode(m_pGLContext, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//start GLEW extension handler
 	glewExperimental = GL_TRUE;
@@ -690,7 +693,6 @@ bool Graphics::BRenderFrame(std::unique_ptr<VR_Manager>& vrm)
 		float currentFrame = glfwGetTime();
 		m_fDeltaTime = currentFrame - m_fLastFrame;
 		DevProcessInput(m_pGLContext);
-		glfwSetCursorPosCallback(m_pGLContext, DevMouseCallback);
 		RenderStereoTargets(vrm);
 		RenderCompanionWindow();
 		m_fLastFrame = currentFrame;
@@ -711,6 +713,7 @@ bool Graphics::BRenderFrame(std::unique_ptr<VR_Manager>& vrm)
 	// SwapWindow
 	{
 		glfwSwapBuffers(m_pGLContext);
+		if(m_bDevMode) glfwSetCursorPosCallback(m_pGLContext, DevMouseCallback);
 	}
 
 	// Clear

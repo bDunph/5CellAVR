@@ -8,6 +8,7 @@
 #endif
 
 #include <iostream>
+#include <vector>
 
 bool SoundObject::setup(GLuint soundObjProg){
 

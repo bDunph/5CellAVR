@@ -26,7 +26,6 @@
 #define _countof(x) (sizeof(x)/sizeof((x)[0]))
 #endif
 
-
 bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GLuint groundPlaneProg, GLuint fiveCellProg, GLuint quadShaderProg){
 
 //************************************************************
@@ -382,12 +381,12 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 
 	//load textures
 	std::vector<std::string> textureNames;
-	textureNames.push_back("misty_ft.tga");
-	textureNames.push_back("misty_bk.tga");
-	textureNames.push_back("misty_up.tga");
-	textureNames.push_back("misty_dn.tga");
-	textureNames.push_back("misty_rt.tga");
-	textureNames.push_back("misty_lf.tga");
+	textureNames.push_back("whiteRoom_nz.jpg");
+	textureNames.push_back("whiteRoom_pz.jpg");
+	textureNames.push_back("whiteRoom_py.jpg");
+	textureNames.push_back("whiteRoom_ny.jpg");
+	textureNames.push_back("whiteRoom_px.jpg");
+	textureNames.push_back("whiteRoom_nx.jpg");
 
 	//std::string name1 = texName.append("_rt.tga");
 	//textureNames.push_back(name1);
