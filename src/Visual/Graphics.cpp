@@ -574,16 +574,16 @@ bool Graphics::BSetupCompanionWindow()
 	std::vector<VertexDataWindow> vVerts;
 
 	// left eye verts
-	vVerts.push_back( VertexDataWindow( glm::vec2(-1, -1), glm::vec2(0, 1)) );
-	vVerts.push_back( VertexDataWindow( glm::vec2(1, -1), glm::vec2(1, 1)) );
-	vVerts.push_back( VertexDataWindow( glm::vec2(-1, 1), glm::vec2(0, 0)) );
-	vVerts.push_back( VertexDataWindow( glm::vec2(1, 1), glm::vec2(1, 0)) );
+	vVerts.push_back( VertexDataWindow( glm::vec2(-1, -1), glm::vec2(0, 0)) );
+	vVerts.push_back( VertexDataWindow( glm::vec2(1, -1), glm::vec2(1, 0)) );
+	vVerts.push_back( VertexDataWindow( glm::vec2(-1, 1), glm::vec2(0, 1)) );
+	vVerts.push_back( VertexDataWindow( glm::vec2(1, 1), glm::vec2(1, 1)) );
 
 	// right eye verts
-	//vVerts.push_back( VertexDataWindow( Vector2(0, -1), Vector2(0, 1)) );
-	//vVerts.push_back( VertexDataWindow( Vector2(1, -1), Vector2(1, 1)) );
-	//vVerts.push_back( VertexDataWindow( Vector2(0, 1), Vector2(0, 0)) );
-	//vVerts.push_back( VertexDataWindow( Vector2(1, 1), Vector2(1, 0)) );
+	//vVerts.push_back( VertexDataWindow( Vector2(0, -1), Vector2(0, 0)) );
+	//vVerts.push_back( VertexDataWindow( Vector2(1, -1), Vector2(1, 0)) );
+	//vVerts.push_back( VertexDataWindow( Vector2(0, 1), Vector2(0, 1)) );
+	//vVerts.push_back( VertexDataWindow( Vector2(1, 1), Vector2(1, 1)) );
 
 	//GLushort vIndices[] = { 0, 1, 3,   0, 3, 2,   4, 5, 7,   4, 7, 6};
 	GLushort vIndices[] = { 0, 1, 3,  0, 3, 2};
