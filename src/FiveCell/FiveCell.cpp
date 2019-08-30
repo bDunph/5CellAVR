@@ -42,7 +42,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 			return false;
 		}
 		std::string val2 = "elevation" + std::to_string(i);
-		const char* elevation = val2 .c_str();
+		const char* elevation = val2.c_str();
 		if(session->GetChannelPtr(hrtfVals[(3 * i) + 1], elevation, CSOUND_INPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
 			std::cout << "GetChannelPtr could not get the elevation input" << std::endl;
 			return false;
@@ -54,7 +54,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 			return false;
 		}
 	}
-//************************************************************
+//**********************************************************
 
 	//glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_LESS);
@@ -761,7 +761,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 
 }
 
-void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat){
+void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront){
 
 //***********************************************************************************************************
 // Update Stuff Here
@@ -781,8 +781,8 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat){
 	//wipe the drawing surface clear
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//update camera position in headspace
-	cameraPos = glm::vec3(viewMat[3][0], viewMat[3][1], viewMat[3][2]);
+	//update camera position in worldspace 
+	cameraPos = glm::vec4(viewMat[0][3], viewMat[1][3], viewMat[2][3], 1.0f);
 
 	//float rotVal = glm::radians(45.0f);
 	//rotation around W axis
@@ -818,29 +818,39 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat){
  	
 		projectedVerts[i] = glm::vec3(projectedPointX, projectedPointY, projectedPointZ);
 			
-		glm::vec4 posView = projMat * viewMat * fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0);
+		glm::vec4 posCameraSpace = viewMat * fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0f);
 
+		//glm::vec4 posWorld = fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0);
 		//calculate azimuth and elevation values for hrtf
 		
-		glm::vec3 viewerPos = cameraPos;
-		glm::vec3 soundPos = glm::vec3(posView); 
-	
+		glm::vec4 viewerPos = cameraPos * glm::vec4(camFront.x, camFront.y, camFront.z, 0.0f);
+		glm::vec4 viewerPosCameraSpace = viewMat * viewerPos;
+		glm::vec4 soundPos = posCameraSpace;
+ 	
 		//distance
-		float r = sqrt((pow((soundPos.x - viewerPos.x), 2)) + (pow((soundPos.y - viewerPos.y), 2)) + (pow((soundPos.z - viewerPos.z), 2)));
+		float r = sqrt((pow((soundPos.x - viewerPosCameraSpace.x), 2)) + (pow((soundPos.y - viewerPosCameraSpace.y), 2)) + (pow((soundPos.z - viewerPosCameraSpace.z), 2)));
 		//std::cout << r << std::endl;	
 	
 		//azimuth
-		float valX = soundPos.x - viewerPos.x;
-		float valZ = soundPos.z - viewerPos.z;
+		float valX = soundPos.x - viewerPosCameraSpace.x;
+		float valZ = soundPos.z - viewerPosCameraSpace.z;
 		float azimuth = atan2(valX, valZ);
 		azimuth *= (180.0f/PI); 	
 		//std::cout << azimuth << std::endl;
 	
 		//elevation
-		float cosVal = (soundPos.y - viewerPos.y) / r;
-		float elevation = asin(cosVal);
+		float oppSide = soundPos.y - viewerPosCameraSpace.y;
+		float adjSide = sqrt(pow(r, 2) - pow(oppSide, 2));
+		float elevation = atan2(oppSide, adjSide);
+		//float cosVal = (soundPos.y - viewerPos.y) / r;
+		//float elevation = asin(cosVal);
 		elevation *= (180.0f/PI);		
-		//std::cout << elevation<< std::endl;
+		if(elevation < -40.0f){
+			elevation = -40.0f;
+		} else if(elevation > 90.0f){
+			elevation = 90.0f;
+		}
+		std::cout << elevation<< std::endl;
 
 		*hrtfVals[3 * i] = (MYFLT)azimuth;
 		*hrtfVals[(3 * i) + 1] = (MYFLT)elevation;
@@ -856,7 +866,6 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat){
 	//float rotAngle = glfwGetTime() * 0.2f;
 	//glm::mat4 fiveCellRotationMatrix3D = glm::rotate(modelMatrix, rotAngle, glm::vec3(0, 1, 0)) ;
 	//fiveCellModelMatrix = scale5CellMatrix;
-		
 }
 
 void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, GLuint quadShaderProg, glm::mat4 projMat, glm::mat4 viewMat, glm::mat4 eyeMat){

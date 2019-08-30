@@ -12,13 +12,13 @@ class FiveCell {
 
 public:
 	bool setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GLuint groundPlaneProg, GLuint fiveCellProg, GLuint quadShaderProg);
-	void update(glm::mat4 projMat, glm::mat4 viewMat);
+	void update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront);
 	void draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjProg, GLuint fiveCellProg, GLuint quadShaderProg, glm::mat4 projMat, glm::mat4 viewMat, glm::mat4 eyeMat);
 	void exit();
 
 private:
 
-	glm::vec3 cameraPos;
+	glm::vec4 cameraPos;
 	glm::vec3 camPosPerEye;
 	//glm::vec3 cameraFront;
 	//glm::vec3 cameraUp;
@@ -27,8 +27,6 @@ private:
 	float currentFrame;
 	//bool needDraw;
 	//float radius;
-
-	MYFLT* hrtfVals[15];
 
 	//ground plane
 	//GLuint groundVAO;
@@ -102,5 +100,6 @@ private:
 
 	//Csound
 	CsoundSession *session;
+	MYFLT* hrtfVals[15];
 };
 #endif

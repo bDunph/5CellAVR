@@ -56,11 +56,11 @@ bool VR_Manager::BInit(){
 
 	std::cout << "Device name: " << m_strDriver << "\nDevice number: " << m_strDisplay << std::endl;
 
-	if (!BInitCompositor())
-	{
-		std::cout << __FUNCTION__ << " - Failed to initialize VR Compositor!\n" << std::endl;
-		return false;
-	}
+	//if (!BInitCompositor())
+	//{
+	//	std::cout << __FUNCTION__ << " - Failed to initialize VR Compositor!\n" << std::endl;
+	//	return false;
+	//}
 
 //*********** removing pathtools from osx build *************//
 #ifdef __APPLE__

@@ -642,10 +642,10 @@ void DevMouseCallback(GLFWwindow* window, double xpos, double ypos){
 	m_fYaw += xOffset;
 	m_fPitch += yOffset;
 	
-	if(m_fPitch > 89.0f)
-  		m_fPitch =  89.0f;
-	if(m_fPitch < -89.0f)
-  		m_fPitch = -89.0f; 
+	if(m_fPitch > 89.9f)
+  		m_fPitch =  89.9f;
+	if(m_fPitch < -89.9f)
+  		m_fPitch = -89.9f; 
 
 	glm::vec3 front;
     	front.x = cos(glm::radians(m_fYaw)) * cos(glm::radians(m_fPitch));
@@ -947,7 +947,7 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 	//glBindVertexArray(0);
 
 	//update variables for fiveCell
-	fiveCell.update(currentProjMatrix, currentViewMatrix);
+	fiveCell.update(currentProjMatrix, currentViewMatrix, m_vec3DevCamFront);
 	
 	//draw fiveCell scene
 	fiveCell.draw(skyboxShaderProg, groundPlaneShaderProg, soundObjShaderProg, fiveCellShaderProg, quadShaderProg, currentProjMatrix, currentViewMatrix, currentEyeMatrix);
