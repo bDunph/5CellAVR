@@ -874,7 +874,7 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 // Draw Stuff Here
 //*********************************************************************************************************
 
-	glm::mat4 viewEyeMat = viewMat * eyeMat;
+	glm::mat4 viewEyeMat = eyeMat * viewMat;
 
 	camPosPerEye = glm::vec3(viewEyeMat[3][0], viewEyeMat[3][1], viewEyeMat[3][2]);
 
