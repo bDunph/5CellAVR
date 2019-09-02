@@ -761,7 +761,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 
 }
 
-void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront){
+void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront, glm::vec3 camPos){
 
 //***********************************************************************************************************
 // Update Stuff Here
@@ -771,7 +771,6 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront){
 	//	std::cout << std::to_string(i) << " --- " << std::to_string(vertArray5Cell[i].x) << " : " << std::to_string(vertArray5Cell[i].y) << " : " << std::to_string(vertArray5Cell[i].z) << " : " << std::to_string(vertArray5Cell[i].w) << std::endl;
 	//}
 		
-
 	currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	
@@ -780,9 +779,6 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront){
 	//glClearColor(0.87, 0.85, 0.75, 0.95);
 	//wipe the drawing surface clear
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//update camera position in worldspace 
-	cameraPos = glm::vec4(viewMat[0][3], viewMat[1][3], viewMat[2][3], 1.0f);
 
 	//float rotVal = glm::radians(45.0f);
 	//rotation around W axis
@@ -805,10 +801,9 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront){
 	float projectionDistance = 2.0f;
 	//for(int i = 0; i < _countof(vertArray); i++){
 
-		
-
 	for(int i = 0; i < 5; i++){
-		glm::vec4 rotatedVert = rotationZW * rotationXW * vertArray5Cell[i];
+
+		glm::vec4 rotatedVert = vertArray5Cell[i];
 
 		//std::cout << std::to_string(vertArray[i].x) << " : " << std::to_string(vertArray[i].y) << " : " << std::to_string(vertArray[i].z) << " : " << std::to_string(vertArray[i].w) << std::endl;
 
@@ -817,38 +812,49 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront){
 		float projectedPointZ = (rotatedVert.z * projectionDistance) / (projectionDistance - rotatedVert.w); 	
  	
 		projectedVerts[i] = glm::vec3(projectedPointX, projectedPointY, projectedPointZ);
+		//std::cout << i << " --- " << projectedVerts[i].x << " : " << projectedVerts[i].y << " : " << projectedVerts[i].z << std::endl;
 			
 		glm::vec4 posCameraSpace = viewMat * fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0f);
+		//std::cout << i << " --- " << posCameraSpace.x << " : " << posCameraSpace.y << " : " << posCameraSpace.z << " : " << posCameraSpace.w << std::endl;
 
 		//glm::vec4 posWorld = fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0);
 		//calculate azimuth and elevation values for hrtf
 		
-		glm::vec4 viewerPos = cameraPos * glm::vec4(camFront.x, camFront.y, camFront.z, 0.0f);
-		glm::vec4 viewerPosCameraSpace = viewMat * viewerPos;
-		glm::vec4 soundPos = posCameraSpace;
- 	
+		glm::vec4 viewerPosCameraSpace = viewMat * glm::vec4(camPos, 1.0f);;
+		//glm::vec4 viewerPosCameraSpace = viewMat * viewerPos;
+
+		glm::vec4 soundPosCameraSpace = posCameraSpace;
+
+		//std::cout << i << " --- " << soundPosCameraSpace.x << " : " << soundPosCameraSpace.y << " : " << soundPosCameraSpace.z << std::endl;
+
 		//distance
-		float r = sqrt((pow((soundPos.x - viewerPosCameraSpace.x), 2)) + (pow((soundPos.y - viewerPosCameraSpace.y), 2)) + (pow((soundPos.z - viewerPosCameraSpace.z), 2)));
+		float r = abs(sqrt((pow((soundPosCameraSpace.x - viewerPosCameraSpace.x), 2)) + (pow((soundPosCameraSpace.y - viewerPosCameraSpace.y), 2)) + (pow((soundPosCameraSpace.z - viewerPosCameraSpace.z), 2))));
+
 		//std::cout << r << std::endl;	
-	
+
 		//azimuth
-		float valX = soundPos.x - viewerPosCameraSpace.x;
-		float valZ = soundPos.z - viewerPosCameraSpace.z;
+		float valX = soundPosCameraSpace.x - viewerPosCameraSpace.x;
+		float valZ = soundPosCameraSpace.z - viewerPosCameraSpace.z;
+
 		float azimuth = atan2(valX, valZ);
 		azimuth *= (180.0f/PI); 	
 		//std::cout << azimuth << std::endl;
 	
 		//elevation
-		float oppSide = soundPos.y - viewerPosCameraSpace.y;
-		float adjSide = sqrt(pow(r, 2) - pow(oppSide, 2));
-		float elevation = atan2(oppSide, adjSide);
-		//float cosVal = (soundPos.y - viewerPos.y) / r;
-		//float elevation = asin(cosVal);
+		float oppSide = soundPosCameraSpace.y - viewerPosCameraSpace.y;
+
+		//std::cout << i << " : " << soundPosCameraSpace.y << " -- SoundPosition" << std::endl;
+		//std::cout << i << " : " << oppSide << std::endl;
+		
+		//float adjSide = abs(sqrt(pow(r, 2) - pow(oppSide, 2)));
+		//float elevation = atan2(oppSide, adjSide);
+		float sinVal = oppSide / r;
+		float elevation = asin(sinVal);
 		elevation *= (180.0f/PI);		
-		if(elevation < -40.0f){
-			elevation = -40.0f;
-		} else if(elevation > 90.0f){
-			elevation = 90.0f;
+		if(oppSide >= 0){
+			if(elevation > 90.0f) elevation = 90.0f;
+		} else if(oppSide < 0){
+			if(elevation < -40.f) elevation = -40.0f;
 		}
 		std::cout << elevation<< std::endl;
 

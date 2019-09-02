@@ -913,6 +913,8 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 	glm::mat4 currentProjMatrix;
 	glm::mat4 currentViewMatrix;
 	glm::mat4 currentEyeMatrix;
+	glm::vec3 cameraFront;
+	glm::vec3 cameraPosition;
 
 	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -922,12 +924,16 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 		currentProjMatrix = vrm->GetCurrentProjectionMatrix(nEye);
 		currentViewMatrix = vrm->GetCurrentViewMatrix(nEye);
 		currentEyeMatrix = vrm->GetCurrentEyeMatrix(nEye);
+		cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+		cameraPosition = glm::vec3(currentViewMatrix[0][3], currentViewMatrix[1][3], currentViewMatrix[2][3]);
 	} else {
 		//*** put manual matrices here***//
 		currentProjMatrix = m_matDevProjMatrix;  
 		m_matDevViewMatrix = glm::lookAt(m_vec3DevCamPos, m_vec3DevCamPos + m_vec3DevCamFront, m_vec3DevCamUp);	
 		currentViewMatrix = m_matDevViewMatrix;
 		currentEyeMatrix = glm::mat4(1.0f);
+		cameraFront = m_vec3DevCamFront;
+		cameraPosition = m_vec3DevCamPos;
 	}
 
 	////draw texture quad
@@ -947,7 +953,7 @@ void Graphics::RenderScene(vr::Hmd_Eye nEye, std::unique_ptr<VR_Manager>& vrm)
 	//glBindVertexArray(0);
 
 	//update variables for fiveCell
-	fiveCell.update(currentProjMatrix, currentViewMatrix, m_vec3DevCamFront);
+	fiveCell.update(currentProjMatrix, currentViewMatrix, cameraFront, cameraPosition);
 	
 	//draw fiveCell scene
 	fiveCell.draw(skyboxShaderProg, groundPlaneShaderProg, soundObjShaderProg, fiveCellShaderProg, quadShaderProg, currentProjMatrix, currentViewMatrix, currentEyeMatrix);
