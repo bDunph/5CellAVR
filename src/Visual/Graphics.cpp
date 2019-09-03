@@ -185,7 +185,7 @@ bool Graphics::BInitGL(bool fullscreen){
 		m_matDevProjMatrix = glm::perspective(45.0f, (float)m_nCompanionWindowWidth/ (float)m_nCompanionWindowHeight, 0.1f, 1000.0f);
 		
 		//variables for view matrix
-		m_vec3DevCamPos = glm::vec3(0.0f, 2.0f, 3.0f);	
+		m_vec3DevCamPos = glm::vec3(0.0f, 0.0f, 3.0f);	
 		m_vec3DevCamUp = glm::vec3(0.0f, 1.0f, 0.0f);
 		m_vec3DevCamFront = glm::vec3(0.0f, 0.0f, -1.0f);
 
@@ -667,7 +667,7 @@ void Graphics::DevProcessInput(GLFWwindow *window){
     	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         	m_vec3DevCamPos += glm::normalize(glm::cross(m_vec3DevCamFront, m_vec3DevCamUp)) * cameraSpeed;	
 	
-	if(m_vec3DevCamPos.y < 2.0f || m_vec3DevCamPos.y > 2.0f) m_vec3DevCamPos.y = 2.0f;
+	if(m_vec3DevCamPos.y < 0.0f || m_vec3DevCamPos.y > 0.0f) m_vec3DevCamPos.y = 0.0f;
 }
 //-----------------------------------------------------------------------------
 // Main function that renders textures to hmd.

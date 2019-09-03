@@ -807,9 +807,9 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront, 
 
 		//std::cout << std::to_string(vertArray[i].x) << " : " << std::to_string(vertArray[i].y) << " : " << std::to_string(vertArray[i].z) << " : " << std::to_string(vertArray[i].w) << std::endl;
 
-		float projectedPointX = (rotatedVert.x * projectionDistance) / (projectionDistance - rotatedVert.w); 	
-		float projectedPointY = (rotatedVert.y * projectionDistance) / (projectionDistance - rotatedVert.w); 	
-		float projectedPointZ = (rotatedVert.z * projectionDistance) / (projectionDistance - rotatedVert.w); 	
+		float projectedPointX = rotatedVert.x / (projectionDistance - rotatedVert.w); 	
+		float projectedPointY = rotatedVert.y / (projectionDistance - rotatedVert.w); 	
+		float projectedPointZ = rotatedVert.z / (projectionDistance - rotatedVert.w); 	
  	
 		projectedVerts[i] = glm::vec3(projectedPointX, projectedPointY, projectedPointZ);
 		//std::cout << i << " --- " << projectedVerts[i].x << " : " << projectedVerts[i].y << " : " << projectedVerts[i].z << std::endl;
@@ -817,50 +817,59 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront, 
 		glm::vec4 posCameraSpace = viewMat * fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0f);
 		//std::cout << i << " --- " << posCameraSpace.x << " : " << posCameraSpace.y << " : " << posCameraSpace.z << " : " << posCameraSpace.w << std::endl;
 
-		//glm::vec4 posWorld = fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0);
+		glm::vec4 posWorldSpace = fiveCellModelMatrix * glm::vec4(projectedVerts[i], 1.0);
 		//calculate azimuth and elevation values for hrtf
 		
-		glm::vec4 viewerPosCameraSpace = viewMat * glm::vec4(camPos, 1.0f);;
-		//glm::vec4 viewerPosCameraSpace = viewMat * viewerPos;
+		glm::vec4 viewerPosCameraSpace = viewMat * glm::vec4(camPos, 1.0f);
+		glm::vec4 viewerPosWorldSpace = glm::vec4(camPos, 1.0f);;
+		//std::cout << i << " --> " << viewerPosWorldSpace.x << " : " << viewerPosWorldSpace.y << " : " << viewerPosWorldSpace.z << std::endl;
 
 		glm::vec4 soundPosCameraSpace = posCameraSpace;
+		glm::vec4 soundPosWorldSpace = posWorldSpace;
 
 		//std::cout << i << " --- " << soundPosCameraSpace.x << " : " << soundPosCameraSpace.y << " : " << soundPosCameraSpace.z << std::endl;
-
+		//std::cout << i << " --- " << soundPosWorldSpace.x << " : " << soundPosWorldSpace.y << " : " << soundPosWorldSpace.z << std::endl;
 		//distance
-		float r = abs(sqrt((pow((soundPosCameraSpace.x - viewerPosCameraSpace.x), 2)) + (pow((soundPosCameraSpace.y - viewerPosCameraSpace.y), 2)) + (pow((soundPosCameraSpace.z - viewerPosCameraSpace.z), 2))));
-
+		//float r = sqrt((pow((soundPosCameraSpace.x - viewerPosCameraSpace.x), 2)) + (pow((soundPosCameraSpace.y - viewerPosCameraSpace.y), 2)) + (pow((soundPosCameraSpace.z - viewerPosCameraSpace.z), 2)));
+		float rCamSpace = sqrt(pow(soundPosCameraSpace.x, 2) + pow(soundPosCameraSpace.y, 2) + pow(soundPosCameraSpace.z, 2));
+		
+		float rWorldSpace = sqrt(pow(soundPosWorldSpace.x - viewerPosWorldSpace.x, 2) + pow(soundPosWorldSpace.y - viewerPosWorldSpace.y, 2) + pow(soundPosWorldSpace.z - viewerPosWorldSpace.z, 2));
 		//std::cout << r << std::endl;	
 
-		//azimuth
+		//azimuth in camera space
 		float valX = soundPosCameraSpace.x - viewerPosCameraSpace.x;
 		float valZ = soundPosCameraSpace.z - viewerPosCameraSpace.z;
 
 		float azimuth = atan2(valX, valZ);
 		azimuth *= (180.0f/PI); 	
+		//float azimuth = 0.0f;
 		//std::cout << azimuth << std::endl;
 	
-		//elevation
-		float oppSide = soundPosCameraSpace.y - viewerPosCameraSpace.y;
+		//elevation in world space
+		
+		float oppSide = soundPosWorldSpace.y - viewerPosWorldSpace.y;
+		//float oppSide = -soundPosCameraSpace.y;
 
-		//std::cout << i << " : " << soundPosCameraSpace.y << " -- SoundPosition" << std::endl;
+		//std::cout << i << " : " << soundPosWorldSpace.y << " -- SoundPosition" << std::endl;
+		//std::cout << i << " : " << viewerPosWorldSpace.y << std::endl;
 		//std::cout << i << " : " << oppSide << std::endl;
 		
 		//float adjSide = abs(sqrt(pow(r, 2) - pow(oppSide, 2)));
 		//float elevation = atan2(oppSide, adjSide);
-		float sinVal = oppSide / r;
+		float sinVal = oppSide / rWorldSpace;
 		float elevation = asin(sinVal);
 		elevation *= (180.0f/PI);		
-		if(oppSide >= 0){
-			if(elevation > 90.0f) elevation = 90.0f;
-		} else if(oppSide < 0){
-			if(elevation < -40.f) elevation = -40.0f;
-		}
-		std::cout << elevation<< std::endl;
+		//if(oppSide >= 0){
+		//	if(elevation > 90.0f) elevation = 90.0f;
+		//} else if(oppSide < 0){
+		//	if(elevation < -40.f) elevation = -40.0f;
+		//}
+		//std::cout << i << " --> " << elevation << std::endl;
+		//float elevation = 0.0f;
 
 		*hrtfVals[3 * i] = (MYFLT)azimuth;
 		*hrtfVals[(3 * i) + 1] = (MYFLT)elevation;
-		*hrtfVals[(3 * i) + 2] = (MYFLT)r;
+		*hrtfVals[(3 * i) + 2] = (MYFLT)rCamSpace;
 
 		//std::cout << std::to_string(i) << " --- " << std::to_string(*hrtfVals[3 * i]) << " : " << std::to_string(*hrtfVals[(3 * i) + 1]) << " : " << std::to_string(*hrtfVals[(3 * i) + 2]) << std::endl;
 			
@@ -882,7 +891,7 @@ void FiveCell::draw(GLuint skyboxProg, GLuint groundPlaneProg, GLuint soundObjPr
 
 	glm::mat4 viewEyeMat = eyeMat * viewMat;
 
-	camPosPerEye = glm::vec3(viewEyeMat[3][0], viewEyeMat[3][1], viewEyeMat[3][2]);
+	camPosPerEye = glm::vec3(viewEyeMat[0][3], viewEyeMat[1][3], viewEyeMat[2][3]);
 
 	//draw 4D polytope	
 	//float a = 0.0f;

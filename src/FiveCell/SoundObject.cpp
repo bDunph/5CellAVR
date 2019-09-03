@@ -129,8 +129,8 @@ void SoundObject::update(glm::vec3 translationVal){
 
 	float soundModelRotAngle = glfwGetTime() * 0.2f;
 	glm::mat4 rotateSoundModel = glm::rotate(identityModelMat, soundModelRotAngle, glm::vec3(0, 1, 0));;
-	glm::vec3 finalTranslation = translationVal + glm::vec3(0.0, 2.0, 0.0);
-	glm::mat4 translateMat = glm::translate(identityModelMat, finalTranslation);
+	//glm::vec3 finalTranslation = translationVal + glm::vec3(0.0, 2.0, 0.0);
+	glm::mat4 translateMat = glm::translate(identityModelMat, translationVal);
 	soundModelMatrix = translateMat * rotateSoundModel * scaleMat;
 }
 
