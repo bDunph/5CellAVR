@@ -40,24 +40,33 @@ iQ24	init p23
 iQ25	init p24
 
 ; to simulate the shock between the excitator and the resonator
-ashock  mpulse  1,2
+ashock  mpulse ampdbfs(-60), 6,	1
 
-aexc1	mode 	ashock,	ifreq11,	iQ11
-aexc1 = aexc1*iamp
+;aexc1	mode 	ashock,	ifreq11,	iQ11
+;aexc1 = aexc1*iamp
+;
+;aexc2  	mode 	ashock,	ifreq12,	iQ12
+;aexc2 = aexc2*iamp
+;
+;aexc3   mode 	ashock,	ifreq13,	iQ13
+;aexc3 = aexc3*iamp
+;
+;aexc4   mode 	ashock, ifreq14,	iQ14
+;aexc4 = aexc4*iamp
+;
+;aexc5   mode 	ashock,	ifreq15,	iQ15
+;aexc5 = aexc5*iamp
 
-aexc2  	mode 	ashock,	ifreq12,	iQ12
-aexc2 = aexc2*iamp
+;aexc = (aexc1+aexc2+aexc3+aexc4+aexc5)/5
 
-aexc3   mode 	ashock,	ifreq13,	iQ13
-aexc3 = aexc3*iamp
+; felt excitator from mode.csd
+aexc1	mode	ashock,	80,	8
+aexc1 = aexc1 * iamp
 
-aexc4   mode 	ashock, ifreq14,	iQ14
-aexc4 = aexc4*iamp
+aexc2	mode	ashock,	188,	3
+aexc2 = aexc2 * iamp
 
-aexc5   mode 	ashock,	ifreq15,	iQ15
-aexc5 = aexc5*iamp
-
-aexc = (aexc1+aexc2+aexc3+aexc4+aexc5)/5
+aexc = (aexc1 + aexc2)/2
 
 ;"Contact" condition : when aexc reaches 0, the excitator looses 
 ;contact with the resonator, and stops "pushing it"
@@ -65,15 +74,26 @@ aexc limit aexc,0,3*iamp
 
 ; 5modes resonator
 
-ares1	mode	aexc,	ifreq21,	iQ21	
+;ares1	mode	aexc1,	ifreq21,	iQ21	
+;
+;ares2	mode	aexc2,	ifreq22,	iQ22
+;
+;ares3	mode	aexc3,	ifreq23,	iQ23
+;
+;ares4	mode	aexc4,	ifreq24,	iQ24
+;
+;ares5	mode	aexc5,	ifreq25,	iQ25
 
-ares2	mode	aexc,	ifreq22,	iQ22
+; Wine Glass with ratios from http://www.csounds.com/manual/html/MiscModalFreq.html
+ares1	mode	aexc,	220,	420
 
-ares3	mode	aexc,	ifreq23,	iQ23
+ares2	mode	aexc,	510.4,	480
 
-ares4	mode	aexc,	ifreq24,	iQ24
+ares3	mode	aexc,	935,	500
 
-ares5	mode	aexc,	ifreq25,	iQ25
+ares4	mode	aexc,	1458.6,	520
+
+ares5	mode	aexc,	2063.6,	540
 
 ares = (ares1+ares2+ares3+ares4+ares5)/5
 
@@ -163,6 +183,9 @@ aRightSigs[4] = aRightSigs[4] / (kDist4 + 0.00001)
 aL = (aLeftSigs[0] + aLeftSigs[1] + aLeftSigs[2] + aLeftSigs[3] + aLeftSigs[4]) / 5
 aR = (aRightSigs[0] + aRightSigs[1] + aRightSigs[2] + aRightSigs[3] + aRightSigs[4]) / 5
 
+;aLimL	limit	aL,	ampdbfs(-96),	ampdbfs(0)
+;aLimR	limit	aR,	ampdbfs(-96),	ampdbfs(0)
+
 outs	aL,	aR
 endin
 
@@ -180,7 +203,9 @@ endin
 <CsScore>
 ;p1	p2	p3	p4	p5	p6	p7	p8	p9	p10	p11	p12	p13	p14	p15	p16	p17	p18	p19	p20	p21	p22	p23	p24
 
-i1 	0 	90 	-6	50	70	82	80	90	1000  	720  	850	700	820	440	882  	660	220	442	500	400	350	130	200
+;i1 	0 	90 	-6	50	70	82	80	90	1000  	720  	850	700	820	440	882  	660	220	442	500	400	350	130	200
+
+i1	0	180	-12
 
 i2	0	90
 

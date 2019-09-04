@@ -744,8 +744,9 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 
 	fiveCellModelMatrix = glm::mat4(1.0);
 
-	glm::vec3 scale5Cell = glm::vec3(20.0f, 20.0f, 20.0f);
-	scale5CellMatrix = glm::scale(modelMatrix, scale5Cell);
+	glm::vec3 scale5Cell = glm::vec3(10.0f, 10.0f, 10.0f);
+	scale5CellMatrix = glm::scale(fiveCellModelMatrix, scale5Cell);
+	fiveCellModelMatrix = scale5CellMatrix;
 	
 //***********************************************************************************************************
 
@@ -874,7 +875,7 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront, 
 		//std::cout << std::to_string(i) << " --- " << std::to_string(*hrtfVals[3 * i]) << " : " << std::to_string(*hrtfVals[(3 * i) + 1]) << " : " << std::to_string(*hrtfVals[(3 * i) + 2]) << std::endl;
 			
 		//update sound object position
-		soundObjects[i].update(projectedVerts[i]);	
+		soundObjects[i].update(glm::vec3(posWorldSpace));	
 		//std::cout << std::to_string(projectedVerts[i].x) << " : " << std::to_string(projectedVerts[i].y) << " : " << std::to_string(projectedVerts[i].z) << std::endl;
 	}
 
