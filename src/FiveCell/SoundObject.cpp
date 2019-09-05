@@ -109,6 +109,8 @@ bool SoundObject::setup(GLuint soundObjProg){
 
 	soundObj_cameraPosLoc = glGetUniformLocation(soundObjProg, "camPos");
 	
+	soundObj_scaleValLoc = glGetUniformLocation(soundObjProg, "scale");
+	
 	//only use during development as computationally expensive
 	bool validProgram = is_valid(soundObjProg);
 	if(!validProgram){
@@ -119,14 +121,23 @@ bool SoundObject::setup(GLuint soundObjProg){
 	glBindVertexArray(0);
 	
 	identityModelMat = glm::mat4(1.0);
-	glm::vec3 scale = glm::vec3(0.1f, 0.1f, 0.1f);
-	scaleMat = glm::scale(identityModelMat, scale);
-
+	
 	return true;
 }
 
-void SoundObject::update(glm::vec3 translationVal){
+//void SoundObject::scale(float val){
+//
+//	glm::vec3 scaleVec = glm::vec3(0.1f + (val * 100.0f), 0.1f + (val * 100.0f), 0.1f + (val * 100.0f));	
+//	scaleMat = glm::scale(identityModelMat, scaleVec);
+//}
 
+void SoundObject::update(glm::vec3 translationVal, float scaleVal){
+
+	float scaleFull = 0.8f;
+	float scaleCalc = scaleVal * scaleFull;
+	float scaleBase = 0.1f;
+	glm::vec3 scaleVec = glm::vec3(scaleCalc + scaleBase);
+	glm::mat4 scaleMat = glm::scale(identityModelMat, scaleVec);
 	float soundModelRotAngle = glfwGetTime() * 0.2f;
 	glm::mat4 rotateSoundModel = glm::rotate(identityModelMat, soundModelRotAngle, glm::vec3(0, 1, 0));;
 	//glm::vec3 finalTranslation = translationVal + glm::vec3(0.0, 2.0, 0.0);

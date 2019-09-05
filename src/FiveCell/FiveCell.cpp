@@ -54,6 +54,37 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 			return false;
 		}
 	}
+
+//********* output values from csound to avr *******************//
+	const char* vert0 = "vert0";
+	if(session->GetChannelPtr(vert0Vol, vert0, CSOUND_OUTPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
+		std::cout << "Csound output value vert0Vol not available" << std::endl;
+		return false;
+	} 
+
+	const char* vert1 = "vert1";
+	if(session->GetChannelPtr(vert1Vol, vert1, CSOUND_OUTPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
+		std::cout << "Csound output value vert1Vol not available" << std::endl;
+		return false;
+	}
+
+	const char* vert2 = "vert2";
+	if(session->GetChannelPtr(vert2Vol, vert2, CSOUND_OUTPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
+		std::cout << "Csound output value vert2Vol not available" << std::endl;
+		return false;
+	}
+
+	const char* vert3 = "vert3";
+	if(session->GetChannelPtr(vert3Vol, vert3, CSOUND_OUTPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
+		std::cout << "Csound output value vert3Vol not available" << std::endl;
+		return false;
+	}
+
+	const char* vert4 = "vert4";
+	if(session->GetChannelPtr(vert4Vol, vert4, CSOUND_OUTPUT_CHANNEL | CSOUND_CONTROL_CHANNEL) != 0){
+		std::cout << "Csound output value vert4Vol not available" << std::endl;
+		return false;
+	}
 //**********************************************************
 
 	//glEnable(GL_DEPTH_TEST);
@@ -744,7 +775,7 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 
 	fiveCellModelMatrix = glm::mat4(1.0);
 
-	glm::vec3 scale5Cell = glm::vec3(10.0f, 10.0f, 10.0f);
+	glm::vec3 scale5Cell = glm::vec3(5.0f, 5.0f, 5.0f);
 	scale5CellMatrix = glm::scale(fiveCellModelMatrix, scale5Cell);
 	fiveCellModelMatrix = scale5CellMatrix;
 	
@@ -768,6 +799,7 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront, 
 // Update Stuff Here
 //*********************************************************************************************************
 
+	
 	//for(int i = 0; i < 5; i++){
 	//	std::cout << std::to_string(i) << " --- " << std::to_string(vertArray5Cell[i].x) << " : " << std::to_string(vertArray5Cell[i].y) << " : " << std::to_string(vertArray5Cell[i].z) << " : " << std::to_string(vertArray5Cell[i].w) << std::endl;
 	//}
@@ -797,14 +829,34 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront, 
 		-sin(glfwGetTime() * 0.2f), 0.0f, 0.0f, cos(glfwGetTime() * 0.2f) 
 	);
 
+	rotationYW = glm::mat4(	
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, cos(glfwGetTime() * 0.2f), 0.0f, -sin(glfwGetTime() * 0.2f),
+		0.0f, 0.0f, 1.0f, 0.0f, 
+		0.0f, sin(glfwGetTime() * 0.2f), 0.0f, cos(glfwGetTime() * 0.2f)
+	);
 	//coords of verts to use for hrtf calculations 
 	glm::vec3 projectedVerts [5];
 	float projectionDistance = 2.0f;
 	//for(int i = 0; i < _countof(vertArray); i++){
+		
+	//get values from csound
+	float vert0AudioSig = *vert0Vol;
+	float vert1AudioSig = *vert1Vol;
+	float vert2AudioSig = *vert2Vol;
+	float vert3AudioSig = *vert3Vol;
+	float vert4AudioSig = *vert4Vol;
+	//std::cout << vert0AudioSig << std::endl;		
+
+	vertRms[0] = vert0AudioSig;
+	vertRms[1] = vert1AudioSig;
+	vertRms[2] = vert2AudioSig;
+	vertRms[3] = vert3AudioSig;
+	vertRms[4] = vert4AudioSig;
 
 	for(int i = 0; i < 5; i++){
 
-		glm::vec4 rotatedVert = vertArray5Cell[i];
+		glm::vec4 rotatedVert = rotationYW * rotationZW * rotationXW * vertArray5Cell[i];
 
 		//std::cout << std::to_string(vertArray[i].x) << " : " << std::to_string(vertArray[i].y) << " : " << std::to_string(vertArray[i].z) << " : " << std::to_string(vertArray[i].w) << std::endl;
 
@@ -873,11 +925,13 @@ void FiveCell::update(glm::mat4 projMat, glm::mat4 viewMat, glm::vec3 camFront, 
 		*hrtfVals[(3 * i) + 2] = (MYFLT)rCamSpace;
 
 		//std::cout << std::to_string(i) << " --- " << std::to_string(*hrtfVals[3 * i]) << " : " << std::to_string(*hrtfVals[(3 * i) + 1]) << " : " << std::to_string(*hrtfVals[(3 * i) + 2]) << std::endl;
-			
+		
 		//update sound object position
-		soundObjects[i].update(glm::vec3(posWorldSpace));	
+		soundObjects[i].update(glm::vec3(posWorldSpace), vertRms[i]);	
 		//std::cout << std::to_string(projectedVerts[i].x) << " : " << std::to_string(projectedVerts[i].y) << " : " << std::to_string(projectedVerts[i].z) << std::endl;
 	}
+
+	
 
 	//float rotAngle = glfwGetTime() * 0.2f;
 	//glm::mat4 fiveCellRotationMatrix3D = glm::rotate(modelMatrix, rotAngle, glm::vec3(0, 1, 0)) ;

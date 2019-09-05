@@ -57,7 +57,8 @@ private:
 
 	glm::mat4 rotationZW;
 	glm::mat4 rotationXW; 
-	
+	glm::mat4 rotationYW; 
+
 	//matrices 
 	glm::mat4 modelMatrix;
 	glm::mat4 scale5CellMatrix;
@@ -72,6 +73,7 @@ private:
 
 	//SoundObjects
 	SoundObject soundObjects [5];
+	float vertRms [5];
 
 	//Skybox
 	//Skybox skybox;
@@ -100,6 +102,11 @@ private:
 
 	//Csound
 	CsoundSession *session;
+	MYFLT* vert0Vol;
+	MYFLT* vert1Vol;
+	MYFLT* vert2Vol;
+	MYFLT* vert3Vol;
+	MYFLT* vert4Vol;
 	MYFLT* hrtfVals[15];
 };
 #endif
