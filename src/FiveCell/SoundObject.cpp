@@ -133,7 +133,7 @@ bool SoundObject::setup(GLuint soundObjProg){
 
 void SoundObject::update(glm::vec3 translationVal, float scaleVal){
 
-	float scaleFull = 0.8f;
+	float scaleFull = 0.5f;
 	float scaleCalc = scaleVal * scaleFull;
 	float scaleBase = 0.1f;
 	glm::vec3 scaleVec = glm::vec3(scaleCalc + scaleBase);

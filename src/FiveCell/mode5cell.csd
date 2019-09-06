@@ -44,7 +44,7 @@ iQ25	init p24
 
 ; to simulate the shock between the excitator and the resonator
 krand	random	1,	10
-ashock  mpulse ampdbfs(-3), krand,	1
+ashock  mpulse ampdbfs(-1), krand,	1
 
 ;aexc1	mode 	ashock,	ifreq11,	iQ11
 ;aexc1 = aexc1*iamp
@@ -113,7 +113,7 @@ iamp    init ampdbfs(p4)
 
 ; to simulate the shock between the excitator and the resonator
 krand	random	1,	10
-ashock  mpulse ampdbfs(-3), krand,	1
+ashock  mpulse ampdbfs(-1), krand,	1
 
 ; felt excitator from mode.csd
 aexc1	mode	ashock,	80,	8
@@ -154,7 +154,7 @@ iamp    init ampdbfs(p4)
 
 ; to simulate the shock between the excitator and the resonator
 krand	random	1,	10
-ashock  mpulse ampdbfs(-3), krand,	1
+ashock  mpulse ampdbfs(-1), krand,	1
 
 ; felt excitator from mode.csd
 aexc1	mode	ashock,	80,	8
@@ -195,7 +195,7 @@ iamp    init ampdbfs(p4)
 
 ; to simulate the shock between the excitator and the resonator
 krand	random	1,	10
-ashock  mpulse ampdbfs(-3), krand,	1
+ashock  mpulse ampdbfs(-1), krand,	1
 
 ; felt excitator from mode.csd
 aexc1	mode	ashock,	80,	8
@@ -236,7 +236,7 @@ iamp    init ampdbfs(p4)
 
 ; to simulate the shock between the excitator and the resonator
 krand	random	1,	10
-ashock  mpulse ampdbfs(-3), krand,	1
+ashock  mpulse ampdbfs(-1), krand,	1
 
 ; felt excitator from mode.csd
 aexc1	mode	ashock,	80,	8

@@ -103,6 +103,8 @@ bool Graphics::BInitGL(bool fullscreen){
 
 		windowWidth = vmode->width;
 		windowHeight = vmode->height;
+		m_nCompanionWindowWidth = windowWidth;
+		m_nCompanionWindowHeight = windowHeight;
 	}
 
 	m_pGLContext = glfwCreateWindow(windowWidth, windowHeight, "AVR", NULL, NULL);	
