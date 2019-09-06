@@ -34,6 +34,10 @@ bool FiveCell::setup(std::string csd, GLuint skyboxProg, GLuint soundObjProg, GL
 	std::string csdName = "";
 	if(!csd.empty()) csdName = csd;
 	session = new CsoundSession(csdName);
+#ifdef _WIN32
+	session->SetOption("-b -128"); 
+	session->SetOption("-B 1024");
+#endif
 	for(int i = 0; i < 5; i++){
 		std::string val1 = "azimuth" + std::to_string(i);
 		const char* azimuth = val1.c_str();	

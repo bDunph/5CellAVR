@@ -2,15 +2,15 @@
 <CsOptions>
 ; Select audio/midi flags here according to platform
 ; Audio out   Audio in    No messages
--odac           -iadc          ;;;RT audio I/O
+-odac          ;-iadc          ;;;RT audio I/O
 ; For Non-realtime ouput leave only the line below:
 ; -o moogvcf.wav -W ;;; for file output any platform
 </CsOptions>
 <CsInstruments>
 
 ; Initialize the global variables.
-sr = 48000
-kr = 4800
+sr = 44100
+kr = 4410
 ksmps = 10
 nchnls = 2
 
