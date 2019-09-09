@@ -9,8 +9,8 @@
 <CsInstruments>
 
 ; Initialize the global variables.
-sr = 44100
-kr = 4410
+sr = 48000
+kr = 4800
 ksmps = 10
 nchnls = 2
 
